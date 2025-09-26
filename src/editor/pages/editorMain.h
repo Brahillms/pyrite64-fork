@@ -4,7 +4,7 @@
 */
 #pragma once
 #include "SDL3/SDL_gpu.h"
-#include "../renderer/texture.h"
+#include "../../renderer/texture.h"
 
 namespace Editor
 {

@@ -26,8 +26,8 @@ add_executable(p64editor src/main.cpp
         vendored/imgui/imgui_widgets.cpp
 
         # editor
-        src/editor/editorScene.h
-        src/editor/editorScene.cpp
+        src/editor/pages/editorScene.h
+        src/editor/pages/editorScene.cpp
         src/renderer/shader.h
         src/renderer/shader.cpp
         src/renderer/vertBuffer.h
@@ -35,9 +35,12 @@ add_executable(p64editor src/main.cpp
         src/renderer/vertex.h
         src/context.h
         src/project/project.h
-        src/editor/editorMain.cpp
+        src/editor/pages/editorMain.cpp
         src/renderer/texture.cpp
         src/renderer/texture.h
+        src/project/project.cpp
+        src/editor/actions.h
+        src/editor/actions.cpp
 )
 
 target_include_directories(p64editor PRIVATE vendored/imgui)

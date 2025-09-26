@@ -7,8 +7,9 @@
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
 
-#include "editor/editorMain.h"
-#include "editor/editorScene.h"
+#include "editor/actions.h"
+#include "editor/pages/editorMain.h"
+#include "editor/pages/editorScene.h"
 #include "renderer/shader.h"
 #include "renderer/texture.h"
 #include "renderer/vertBuffer.h"
@@ -112,6 +113,17 @@ int main(int, char**)
   ImFont* font = io.Fonts->AddFontFromFileTTF("./data/Altinn-DINExp.ttf");
   IM_ASSERT(font != nullptr);
   {
+    Editor::Actions::init();
+    Editor::Actions::registerAction(Editor::Actions::Type::PROJECT_OPEN, [](const std::string &path) {
+      printf("Action: Open project: %s\n", path.c_str());
+      delete ctx.project;
+      ctx.project = new Project::Project(path);
+      return true;
+    });
+
+    // TEST:
+    Editor::Actions::call(Editor::Actions::Type::PROJECT_OPEN, "/home/mbeboek/Documents/projects/pyrite64/n64/examples/hello_world");
+
     Editor::Main editorMain{gpu_device};
     Editor::Scene editorScene{};
 

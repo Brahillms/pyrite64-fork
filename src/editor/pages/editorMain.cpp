@@ -9,6 +9,7 @@
 #include <mutex>
 
 #include "imgui.h"
+#include "../actions.h"
 #include "backends/imgui_impl_sdlgpu3.h"
 #include "SDL3/SDL_dialog.h"
 
@@ -151,9 +152,7 @@ void Editor::Main::draw()
 
   if (hasProjectPath) {
     std::lock_guard lock{mtxProjectPath};
-    if (!projectPath.empty()) {
-      printf("Open project: %s\n", projectPath.c_str());
-    }
+    Actions::call(Actions::Type::PROJECT_OPEN, projectPath);
     fileSelectIsOpen = false;
     hasProjectPath = false;
   }
