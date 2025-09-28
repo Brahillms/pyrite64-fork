@@ -63,7 +63,7 @@ void Editor::Scene::draw()
   }
 
   ImGui::Begin("Viewport");
-    ImGui::Text("Viewport");
+    viewport3d.draw();
   ImGui::End();
 
   ImGui::Begin("Inspector");

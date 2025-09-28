@@ -7,4 +7,5 @@
 namespace ImGui
 {
   void applyTheme();
+  void loadFonts(float contentScale);
 }

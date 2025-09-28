@@ -54,6 +54,10 @@ add_executable(p64editor src/main.cpp
         vendored/IconFontCppHeaders/IconsFontAwesome4.h
         src/utils/filePicker.h
         src/utils/filePicker.cpp
+        src/editor/pages/parts/viewport3D.h
+        src/editor/pages/parts/viewport3D.cpp
+        src/renderer/scene.h
+        src/renderer/scene.cpp
 )
 
 target_include_directories(p64editor PRIVATE vendored/imgui vendored/simdjson vendored/IconFontCppHeaders)

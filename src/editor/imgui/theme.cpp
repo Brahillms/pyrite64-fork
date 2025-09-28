@@ -3,8 +3,8 @@
 * @license MIT
 */
 #include "theme.h"
-
 #include "imgui.h"
+#include "IconsFontAwesome4.h"
 
 void ImGui::applyTheme()
 {
@@ -78,4 +78,23 @@ void ImGui::applyTheme()
   style.FramePadding = ImVec2(6, 4);
   style.ItemSpacing = ImVec2(8, 6);
   style.PopupBorderSize = 0.f;
+}
+
+void ImGui::loadFonts(float contentScale) {
+  ImGuiIO& io = ImGui::GetIO();
+  ImGuiStyle& style = ImGui::GetStyle();
+  style.ScaleAllSizes(contentScale);        // Bake a fixed style scale. (until we have a solution for dynamic style scaling, changing this requires resetting Style + calling this again)
+  style.FontScaleDpi = contentScale;        // Set initial font scale. (using io.ConfigDpiScaleFonts=true makes this unnecessary. We leave both here for documentation purpose)
+
+  style.FontSizeBase = 15.0f;
+  ImFont* font = io.Fonts->AddFontFromFileTTF("./data/Altinn-DINExp.ttf");
+  IM_ASSERT(font != nullptr);
+
+  static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_16_FA, 0 };
+  ImFontConfig icons_config;
+  icons_config.MergeMode = true;
+  icons_config.PixelSnapH = true;
+  icons_config.GlyphMinAdvanceX = 15.0f;
+  font = io.Fonts->AddFontFromFileTTF("./data/fontawesome-webfont.ttf", 14, &icons_config, icons_ranges);
+  IM_ASSERT(font != nullptr);
 }

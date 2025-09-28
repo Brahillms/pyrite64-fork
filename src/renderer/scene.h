@@ -3,17 +3,17 @@
 * @license MIT
 */
 #pragma once
-#include "parts/viewport3D.h"
 
-namespace Editor
+namespace Renderer
 {
   class Scene
   {
     private:
-      Viewport3D viewport3d{};
-      bool dockSpaceInit{false};
 
     public:
+      Scene();
+      ~Scene();
+
       void draw();
   };
 }

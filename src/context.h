@@ -4,12 +4,13 @@
 */
 #pragma once
 #include "project/project.h"
-#include "SDL3/SDL_video.h"
+#include "SDL3/SDL.h"
 
 struct Context
 {
   Project::Project *project{nullptr};
   SDL_Window* window{nullptr};
+  SDL_GPUDevice *gpu{nullptr};
 };
 
 extern Context ctx;
