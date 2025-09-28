@@ -13,11 +13,14 @@
 #include "./vertBuffer.h"
 #include "shader.h"
 
+SDL_GPUTexture* fb3D{nullptr};
+
 namespace
 {
   SDL_GPUGraphicsPipeline* graphicsPipeline{nullptr};
   Renderer::VertBuffer *vertBuff{nullptr};
   Renderer::Shader *shader3d{nullptr};
+
 
   std::vector<Renderer::Vertex> vertices{};
 
@@ -76,10 +79,23 @@ Renderer::Scene::Scene()
 
   vertBuff = new Renderer::VertBuffer({sizeof(vertices), ctx.gpu});
   vertBuff->setData(vertices);
+
+  // Create texture
+  SDL_GPUTextureCreateInfo texture_info = {};
+  texture_info.type = SDL_GPU_TEXTURETYPE_2D;
+  texture_info.format = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM;
+  texture_info.usage = SDL_GPU_TEXTUREUSAGE_COLOR_TARGET | SDL_GPU_TEXTUREUSAGE_SAMPLER;
+  texture_info.width = 640;
+  texture_info.height = 480;
+  texture_info.layer_count_or_depth = 1;
+  texture_info.num_levels = 1;
+  texture_info.sample_count = SDL_GPU_SAMPLECOUNT_1;
+  fb3D = SDL_CreateGPUTexture(ctx.gpu, &texture_info);
 }
 
 Renderer::Scene::~Scene() {
   SDL_ReleaseGPUGraphicsPipeline(ctx.gpu, graphicsPipeline);
+  SDL_ReleaseGPUTexture(ctx.gpu, fb3D);
 }
 
 void Renderer::Scene::draw()
@@ -99,8 +115,8 @@ void Renderer::Scene::draw()
 
   // Setup and start a render pass
   SDL_GPUColorTargetInfo targetInfo3D = {};
-  targetInfo3D.texture = swapchain_texture;
-  targetInfo3D.clear_color = {0.12f, 0.12f, 0.12f, 0};
+  targetInfo3D.texture = fb3D;
+  targetInfo3D.clear_color = {0, 0, 0, 1};
   targetInfo3D.load_op = SDL_GPU_LOADOP_CLEAR;
   targetInfo3D.store_op = SDL_GPU_STOREOP_STORE;
   targetInfo3D.mip_level = 0;
@@ -109,7 +125,7 @@ void Renderer::Scene::draw()
 
   SDL_GPUColorTargetInfo targetInfo2D = {};
   targetInfo2D.texture = swapchain_texture;
-  targetInfo2D.clear_color = {0,0,0,0};
+  targetInfo2D.clear_color = {0.12f, 0.12f, 0.12f, 1};
   targetInfo2D.load_op = SDL_GPU_LOADOP_CLEAR;
   targetInfo2D.store_op = SDL_GPU_STOREOP_STORE;
   targetInfo2D.mip_level = 0;
