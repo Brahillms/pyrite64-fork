@@ -53,9 +53,21 @@ void Editor::AssetsBrowser::draw()
       }
     }
 
-    ImGui::ImageButton(asset.name.c_str(), icon,
-      {imageSize, imageSize}, {0,0}, {1,1}, {0,0,0,0}, {1,1,1, 0.75f}
-    );
+
+    bool isSelected = (ctx.selAssetUUID == asset.uuid);
+    if(isSelected) {
+      ImGui::PushStyleColor(ImGuiCol_Button, {0.5f,0.5f,0.7f,1});
+      ImGui::PushStyleColor(ImGuiCol_ButtonHovered, {0.5f,0.5f,0.7f,0.8f});
+    }
+
+    if (ImGui::ImageButton(asset.name.c_str(), icon,
+      {imageSize, imageSize}, {0,0}, {1,1}, {0,0,0,0}, {1,1,1,1}
+    )) {
+      ctx.selAssetUUID = asset.uuid;
+    }
+
+    if(isSelected)ImGui::PopStyleColor(2);
+
     if(ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
     {
       ImGui::SetTooltip("File: %s\nUUID: %08X-%08X", asset.name.c_str(),

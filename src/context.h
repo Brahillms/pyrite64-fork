@@ -10,10 +10,14 @@ namespace Renderer { class Scene; }
 
 struct Context
 {
+  // Globals
   Project::Project *project{nullptr};
   Renderer::Scene *scene{nullptr};
   SDL_Window* window{nullptr};
   SDL_GPUDevice *gpu{nullptr};
+
+  // Editor state
+  uint64_t selAssetUUID{0};
 };
 
 extern Context ctx;
