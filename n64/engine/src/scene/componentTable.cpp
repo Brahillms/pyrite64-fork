@@ -11,7 +11,7 @@
     .init   = reinterpret_cast<FuncInit>(Comp::name::init), \
     .update = reinterpret_cast<FuncUpdate>(Comp::name::update), \
     .draw   = reinterpret_cast<FuncDraw>(Comp::name::draw), \
-    .allocSize = sizeof(Comp::name), \
+    .getAllocSize = reinterpret_cast<FuncGetAllocSize>(Comp::name::getAllocSize), \
   }
 
 namespace P64

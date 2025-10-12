@@ -16,6 +16,8 @@ include $(N64_INST)/include/t3d.mk
 N64_CXXFLAGS += -std=gnu++20 -ftrivial-auto-var-init=uninitialized -fno-exceptions -Os -Isrc \
     -I$(ENGINE_DIR)/include
 
+# Allow custom attributes, otherwise GCC (rightfully) complains unknown ones
+$(BUILD_DIR)/src/user/%.o: N64_CXXFLAGS += -Wno-attributes
 
 src =  $(wildcard src/*.cpp) $(wildcard src/p64/*.cpp) $(wildcard src/user/*.cpp)
 

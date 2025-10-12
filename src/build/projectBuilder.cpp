@@ -105,6 +105,7 @@ bool Build::buildProject(std::string path)
   }
 
   Build::SceneCtx sceneCtx{};
+  sceneCtx.project = &project;
 
   // Scripts
   buildScripts(project, sceneCtx);

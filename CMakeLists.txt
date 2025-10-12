@@ -109,6 +109,8 @@ add_executable(p64editor src/main.cpp
         src/cli.h
         src/build/scriptBuilder.cpp
         n64/engine/include/script/scriptTable.h
+        src/utils/codeParser.h
+        src/utils/codeParser.cpp
 )
 
 target_include_directories(p64editor PRIVATE

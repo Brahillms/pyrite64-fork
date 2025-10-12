@@ -15,6 +15,7 @@ namespace Project::Component::Code
   struct Data
   {
     uint64_t scriptUUID{0};
+    std::unordered_map<std::string, std::string> args{};
   };
 
   std::shared_ptr<void> init(Object &obj) {
@@ -26,12 +27,25 @@ namespace Project::Component::Code
     Data &data = *static_cast<Data*>(entry.data.get());
     Utils::JSON::Builder builder{};
     builder.set("script", data.scriptUUID);
+
+    Utils::JSON::Builder builderArgs{};
+    for (auto &arg : data.args) {
+      builderArgs.set(arg.first, arg.second);
+    }
+    builder.set("args", builderArgs);
+
     return builder.toString();
   }
 
   std::shared_ptr<void> deserialize(simdjson::simdjson_result<simdjson::dom::object> &doc) {
     auto data = std::make_shared<Data>();
     data->scriptUUID = doc["script"].get<uint64_t>();
+    if (!doc["args"].error()) {
+      auto argsObj = doc["args"].get_object();
+      for (auto field : argsObj) {
+        data->args[std::string{field.key}] = field.value.get_string().value();
+      }
+    }
     return data;
   }
 
@@ -49,6 +63,16 @@ namespace Project::Component::Code
 
     ctx.fileObj.write<uint16_t>(id);
     ctx.fileObj.write<uint16_t>(0);
+
+    auto script = ctx.project->getAssets().getEntryByUUID(data.scriptUUID);
+    if (!script)return;
+
+    for (auto &field : script->params.fields) {
+      auto val = data.args[field.name];
+      if (val.empty())val = field.defaultValue;
+      if (val.empty())val = "0";
+      ctx.fileObj.writeAs(val, field.type);
+    }
   }
 
   const char* getter(void* user_data, int idx)
@@ -77,7 +101,29 @@ namespace Project::Component::Code
       }
 
       ImGui::Combo("##UUID", &idx, getter, nullptr, scriptList.size()+1);
-      data.scriptUUID = scriptList[idx].uuid;
+
+      if (idx < scriptList.size()) {
+        const auto &script = scriptList[idx];
+        data.scriptUUID = script.uuid;
+
+        ImGui::InpTable::add("Arguments:");
+        if (script.params.fields.empty()) {
+          ImGui::Text("(None)");
+        }
+
+        int idx = 0;
+        for (auto &field : script.params.fields)
+        {
+          std::string name = field.name;
+          auto metaName = field.attr.find("P64::Name");
+          if (metaName != field.attr.end()) {
+            name = metaName->second;
+          }
+
+          ImGui::InpTable::addString(name, data.args[field.name]);
+          ++idx;
+        }
+      }
 
       ImGui::InpTable::end();
     }

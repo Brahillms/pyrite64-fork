@@ -3,7 +3,11 @@
 
 namespace P64::Script::C52A4013240F9C81
 {
-  void update(Object& obj)
+  struct Data
+  {
+  };
+
+  void update(Object &obj, Data *data)
   {
     //debugf("Script A (C52A4013240F9C81)\n");
 

@@ -97,7 +97,7 @@ void P64::Scene::loadScene() {
             auto argSize = ptrIn[1] * 4;
 
             const auto &compDef = COMP_TABLE[compId];
-            allocSize += compDef.allocSize;
+            allocSize += compDef.getAllocSize(ptrIn + 2);
             allocSize += sizeof(Object::CompRef);
 
             ptrIn += argSize;

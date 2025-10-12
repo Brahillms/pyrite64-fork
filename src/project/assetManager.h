@@ -6,7 +6,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-
+#include "../utils/codeParser.h"
 #include "../renderer/texture.h"
 
 namespace Project
@@ -54,6 +54,7 @@ namespace Project
         FileType type{};
         Renderer::Texture *texture{nullptr};
         AssetConf conf{};
+        Utils::CPP::Struct params{};
       };
 
     private:

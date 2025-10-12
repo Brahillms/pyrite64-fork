@@ -8,15 +8,17 @@ namespace P64::Script
 {
 __CODE_DECL__
 
-  FuncUpdate codeTable[] = {
+  ScriptEntry codeTable[] = {
 __CODE_ENTRIES__
   };
 
-  FuncUpdate getCodeByIndex(uint32_t idx)
+  constinit ScriptEntry codeDummy{};
+
+  ScriptEntry& getCodeByIndex(uint32_t idx)
   {
     if (idx < sizeof(codeTable)/sizeof(codeTable[0])) {
       return codeTable[idx];
     }
-    return nullptr;
+    return codeDummy;
   }
 }

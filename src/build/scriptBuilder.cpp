@@ -23,10 +23,23 @@ void Build::buildScripts(Project::Project &project, SceneCtx &sceneCtx)
   uint32_t idx = 0;
   for (auto &script : scripts)
   {
+    auto src = Utils::FS::loadTextFile(script.path);
+    bool hasUpdate = Utils::CPP::hasFunction(src, "void", "update");
+    bool hasDraw = Utils::CPP::hasFunction(src, "void", "draw");
+    uint32_t dataSize = Utils::CPP::calcStructSize(script.params);
+
     auto uuidStr = std::format("{:016X}", script.uuid);
 
-    srcEntries += "    " + uuidStr + "::update,\n";
-    srcDecl += "  namespace " + uuidStr + " { void update(Object& obj); }\n";
+    srcDecl += "  namespace " + uuidStr + " {\nstruct Data;\n";
+    if(hasUpdate)srcDecl += "void update(Object& obj, Data *data);\n";
+    if(hasDraw)srcDecl += "void draw(Object& obj, Data *data);\n";
+    srcDecl += "}\n";
+
+    srcEntries += "{\n";
+    if(hasUpdate)srcEntries += " .update = (FuncUpdate)" + uuidStr + "::update,\n";
+    if(hasDraw)srcEntries += " .draw = (FuncUpdate)" + uuidStr + "::draw,\n";
+    srcEntries += " .dataSize = " + std::to_string(dataSize) + ",\n";
+    srcEntries += "},\n";
 
     sceneCtx.codeIdxMapUUID[script.uuid] = idx;
 

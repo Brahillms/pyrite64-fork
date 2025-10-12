@@ -7,11 +7,19 @@
 #include <cstdio>
 #include <unordered_map>
 #include <bit>
+#include <stdexcept>
+#include <cstdint>
 
 #include "color.h"
 
 namespace Utils
 {
+  enum DataType
+  {
+    u8, s8, u16, s16, u32, s32,
+    f32,
+  };
+
   class BinaryFile
   {
     private:
@@ -75,6 +83,20 @@ namespace Utils
       void writeArray(const T* arr, size_t count) {
         for(size_t i=0; i<count; ++i) {
           write(arr[i]);
+        }
+      }
+
+      void writeAs(const std::string &str, DataType type) {
+        switch(type) {
+          case f32: write<float>(std::stof(str)); break;
+          case u32: write<uint32_t>(std::stoul(str)); break;
+          case s32: write<int32_t>(std::stol(str)); break;
+          case u16: write<uint16_t>(std::stoul(str)); break;
+          case s16: write<int16_t>(std::stol(str)); break;
+          case u8: write<uint8_t>(std::stoul(str)); break;
+          case s8: write<int8_t>(std::stol(str)); break;
+          default:
+            throw std::runtime_error("unsupported data type");
         }
       }
 

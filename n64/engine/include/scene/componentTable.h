@@ -9,6 +9,7 @@ namespace P64
 {
   class Object;
 
+  typedef uint32_t(*FuncGetAllocSize)(void*);
   typedef void(*FuncInit)(Object&, void*, void*);
   typedef void(*FuncUpdate)(Object&, void*);
   typedef void(*FuncDraw)(Object&, void*);
@@ -18,7 +19,7 @@ namespace P64
     FuncInit init{};
     FuncUpdate update{};
     FuncDraw draw{};
-    uint32_t allocSize{};
+    FuncGetAllocSize getAllocSize{};
   };
 
   constexpr uint32_t COMP_TABLE_SIZE = 8;

@@ -8,6 +8,7 @@
 #include <format>
 
 #include "SHA256.h"
+#include "../utils/codeParser.h"
 #include "../utils/fs.h"
 #include "../utils/hash.h"
 #include "../utils/json.h"
@@ -110,6 +111,7 @@ void Project::AssetManager::reload() {
       }
 
       auto code = Utils::FS::loadTextFile(path);
+
       auto uuidPos = code.find("Script::");
       if (uuidPos == std::string::npos)continue;
       uuidPos += 8;
@@ -127,6 +129,7 @@ void Project::AssetManager::reload() {
         .name = path.filename().string(),
         .path = path.string(),
         .type = type,
+        .params = Utils::CPP::parseDataStruct(code, "Data")
       };
 
       entries.push_back(entry);
