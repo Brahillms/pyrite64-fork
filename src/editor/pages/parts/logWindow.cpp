@@ -8,6 +8,7 @@
 #include "../../../context.h"
 #include "../../../utils/logger.h"
 #include "../../imgui/theme.h"
+#include "imgui_internal.h"
 
 namespace
 {
@@ -29,7 +30,12 @@ void Editor::LogWindow::draw()
 
   if (lastLen != log.length()) {
     lastLen = log.length();
-    ImGui::SetScrollHereY(1);
+
+    // scroll to bottom
+    const char* inputWinName = nullptr;
+    ImFormatStringToTempBuffer(&inputWinName, nullptr, "%s/_%08X", GImGui->CurrentWindow->Name, ImGui::GetID(""));
+    ImGuiWindow* inputWin = ImGui::FindWindowByName(inputWinName);
+    ImGui::SetScrollY(inputWin, inputWin->ScrollMax.y);
   }
 
   ImGui::PopStyleColor();
