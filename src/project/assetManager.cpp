@@ -147,7 +147,9 @@ void Project::AssetManager::save()
 {
   for(auto &entry : entries)
   {
-    if(entry.type == FileType::UNKNOWN)continue;
+    if(entry.type == FileType::UNKNOWN || entry.type == FileType::CODE) {
+      continue;
+    }
 
     auto pathMeta = entry.path + ".conf";
     auto json = entry.conf.serialize();
