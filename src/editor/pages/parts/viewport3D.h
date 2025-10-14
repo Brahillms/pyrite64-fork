@@ -17,6 +17,12 @@ namespace Editor
       Renderer::Camera camera{};
       uint32_t passId{};
 
+      bool isMouseHover{false};
+      bool isMouseDown{false};
+
+      glm::vec2 mousePos{};
+      glm::vec2 mousePosStart{};
+
       void onRenderPass(SDL_GPUCommandBuffer* cmdBuff, SDL_GPUGraphicsPipeline* pipeline);
       void onCopyPass(SDL_GPUCommandBuffer* cmdBuff, SDL_GPUCopyPass *copyPass);
 
