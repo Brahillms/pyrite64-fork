@@ -5,6 +5,8 @@
 #pragma once
 #include <SDL3/SDL.h>
 
+#include "../utils/color.h"
+
 namespace Renderer
 {
   class Framebuffer
@@ -19,6 +21,13 @@ namespace Renderer
     public:
       Framebuffer();
       ~Framebuffer();
+
+      void setClearColor(const Utils::Color &color) {
+        targetInfo.clear_color.r = color.r;
+        targetInfo.clear_color.g = color.g;
+        targetInfo.clear_color.b = color.b;
+        targetInfo.clear_color.a = color.a;
+      }
 
       void resize(uint32_t width, uint32_t height);
 

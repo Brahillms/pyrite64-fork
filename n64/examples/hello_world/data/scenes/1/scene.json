@@ -2,7 +2,7 @@
 "conf": {"name":"Scene A",
 "fbWidth":320,
 "fbHeight":240,
-"fbFormat":0,"clearColor":[0.9677419662475586,0.9467204809188843,0.31607699394226074,1.0],
+"fbFormat":0,"clearColor":[0.6464294791221619,0.7782257795333862,0.7750371694564819,1.0],
 "doClearColor":true,
 "doClearDepth":true},
 "graph": {"id":0,
@@ -13,5 +13,8 @@
 "uuid":8610499884717988503,
 "name":" Code A","data":{"script":14100591792882240448,"args":{"sceneId":"2",
 "speed":"1.0"}}
-}],"children":[]}]}
+}],"children":[]},
+{"id":2,
+"name":"Test Mesh",
+"uuid":3640106842543303841,"pos":[0.0,0.0,0.0],"rot":[0.0,0.0,0.0,0.0],"scale":[0.0,0.0,0.0],"components":[],"children":[]}]}
 }

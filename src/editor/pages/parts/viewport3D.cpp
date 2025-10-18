@@ -81,6 +81,7 @@ void Editor::Viewport3D::onCopyPass(SDL_GPUCommandBuffer* cmdBuff, SDL_GPUCopyPa
 
 void Editor::Viewport3D::draw() {
   camera.update();
+  fb.setClearColor(ctx.project->getScenes().getLoadedScene()->conf.clearColor);
 
   auto currSize = ImGui::GetContentRegionAvail();
   auto currPos = ImGui::GetWindowPos();
