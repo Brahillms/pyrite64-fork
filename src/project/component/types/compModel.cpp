@@ -10,6 +10,9 @@
 #include "../../../utils/binaryFile.h"
 #include "../../../utils/logger.h"
 #include "../../assetManager.h"
+#include "../../../editor/pages/parts/viewport3D.h"
+#include "../../../renderer/scene.h"
+#include "../../../utils/meshGen.h"
 
 namespace Project::Component::Model
 {
@@ -18,6 +21,7 @@ namespace Project::Component::Model
     uint64_t modelUUID{0};
     Renderer::Object obj3D{};
     bool obj3DLoaded{false};
+    Utils::AABB aabb{};
   };
 
   std::shared_ptr<void> init(Object &obj) {
@@ -52,28 +56,6 @@ namespace Project::Component::Model
 
     ctx.fileObj.write<uint16_t>(id);
     ctx.fileObj.write<uint16_t>(0);
-
-    /*auto idRes = ctx.codeIdxMapUUID.find(data.scriptUUID);
-    uint16_t id = 0xDEAD;
-    if (idRes == ctx.codeIdxMapUUID.end()) {
-      Utils::Logger::log("Component Code: Script UUID not found: " + std::to_string(entry.uuid), Utils::Logger::LEVEL_ERROR);
-    } else {
-      id = idRes->second;
-    }
-
-    ctx.fileObj.write<uint16_t>(id);
-    ctx.fileObj.write<uint16_t>(0);
-
-    auto script = ctx.project->getAssets().getEntryByUUID(data.scriptUUID);
-    if (!script)return;
-
-    for (auto &field : script->params.fields) {
-      auto val = data.args[field.name];
-      if (val.empty())val = field.defaultValue;
-      if (val.empty())val = "0";
-      ctx.fileObj.writeAs(val, field.type);
-    }
-    */
   }
 
   const char* getter(void* user_data, int idx)
@@ -116,12 +98,13 @@ namespace Project::Component::Model
     }
   }
 
-  void draw3D(Object& obj, Entry &entry, SDL_GPUCommandBuffer* cmdBuff, SDL_GPURenderPass* pass)
+  void draw3D(Object& obj, Entry &entry, Editor::Viewport3D &vp, SDL_GPUCommandBuffer* cmdBuff, SDL_GPURenderPass* pass)
   {
     Data &data = *static_cast<Data*>(entry.data.get());
     if (!data.obj3DLoaded) {
       auto asset = ctx.project->getAssets().getEntryByUUID(data.modelUUID);
       if (asset && asset->mesh3D) {
+        data.aabb = asset->mesh3D->getAABB();
         data.obj3D.setMesh(asset->mesh3D);
       }
       data.obj3DLoaded = true;
@@ -129,5 +112,20 @@ namespace Project::Component::Model
 
     data.obj3D.setPos(obj.pos);
     data.obj3D.draw(pass, cmdBuff);
+
+    bool isSelected = ctx.selObjectUUID == obj.uuid;
+    //if (ctx.selObjectUUID == obj.uuid)
+    {
+      auto center = obj.pos + data.aabb.getCenter();
+      auto halfExt = data.aabb.getHalfExtend() * obj.scale * 128.0f;
+
+      glm::u8vec4 aabbCol{0xAA,0xAA,0xAA,0xFF};
+      if (isSelected) {
+        aabbCol = {0xFF,0xAA,0x00,0xFF};
+      }
+
+      Utils::Mesh::addLineBox(*vp.getLines(), center, halfExt, aabbCol);
+      Utils::Mesh::addLineBox(*vp.getLines(), center, halfExt * 1.01f, aabbCol);
+    }
   }
 }

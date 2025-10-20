@@ -150,6 +150,7 @@ add_executable(p64editor src/main.cpp
         src/project/component/types/compModel.cpp
         src/renderer/pipeline.h
         src/renderer/pipeline.cpp
+        src/utils/aabb.h
 )
 
 target_include_directories(p64editor PRIVATE

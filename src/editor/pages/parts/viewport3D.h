@@ -30,12 +30,19 @@ namespace Editor
       std::shared_ptr<Renderer::Mesh> meshGrid{};
       Renderer::Object objGrid{};
 
+      std::shared_ptr<Renderer::Mesh> meshLines{};
+      Renderer::Object objLines{};
+
       void onRenderPass(SDL_GPUCommandBuffer* cmdBuff, Renderer::Scene& renderScene);
       void onCopyPass(SDL_GPUCommandBuffer* cmdBuff, SDL_GPUCopyPass *copyPass);
 
     public:
       Viewport3D();
       ~Viewport3D();
+
+      std::shared_ptr<Renderer::Mesh> getLines() {
+        return meshLines;
+      }
 
       void draw();
   };

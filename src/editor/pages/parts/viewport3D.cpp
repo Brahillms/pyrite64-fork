@@ -41,6 +41,9 @@ Editor::Viewport3D::Viewport3D()
   meshGrid->recreate(*ctx.scene);
   objGrid.setMesh(meshGrid);
 
+  meshLines = std::make_shared<Renderer::Mesh>();
+  objLines.setMesh(meshLines);
+
   auto &gizStyle = ImViewGuizmo::GetStyle();
   gizStyle.scale = 0.5f;
   gizStyle.circleRadius = 19.0f;
@@ -56,6 +59,9 @@ Editor::Viewport3D::~Viewport3D() {
 
 void Editor::Viewport3D::onRenderPass(SDL_GPUCommandBuffer* cmdBuff, Renderer::Scene& renderScene)
 {
+  meshLines->vertLines.clear();
+  meshLines->indices.clear();
+
   SDL_GPURenderPass* renderPass3D = SDL_BeginGPURenderPass(
     cmdBuff, &fb.getTargetInfo(), 1, &fb.getDepthTargetInfo()
   );
@@ -72,14 +78,17 @@ void Editor::Viewport3D::onRenderPass(SDL_GPUCommandBuffer* cmdBuff, Renderer::S
     {
       auto &def = Project::Component::TABLE[comp.id];
       if (def.funcDraw3D) {
-        def.funcDraw3D(*child, comp, cmdBuff, renderPass3D);
+        def.funcDraw3D(*child, comp, *this, cmdBuff, renderPass3D);
       }
     }
     //child.draw(renderPass3D, cmdBuff);
   }
 
+  meshLines->recreate(renderScene);
+
   renderScene.getPipeline("lines").bind(renderPass3D);
   objGrid.draw(renderPass3D, cmdBuff);
+  objLines.draw(renderPass3D, cmdBuff);
 
   SDL_EndGPURenderPass(renderPass3D);
 }

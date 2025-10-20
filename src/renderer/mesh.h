@@ -7,6 +7,7 @@
 
 #include "vertBuffer.h"
 #include "vertex.h"
+#include "../utils/aabb.h"
 #include "glm/vec3.hpp"
 
 namespace Renderer
@@ -18,6 +19,7 @@ namespace Renderer
     private:
       Renderer::VertBuffer *vertBuff{nullptr};
       bool dataReady = false;
+      Utils::AABB aabb{};
 
     public:
       std::vector<Renderer::Vertex> vertices{};
@@ -27,6 +29,8 @@ namespace Renderer
       void recreate(Renderer::Scene &scene);
 
       void draw(SDL_GPURenderPass* pass);
+
+      const Utils::AABB& getAABB() const { return aabb; }
 
       Mesh();
       ~Mesh();

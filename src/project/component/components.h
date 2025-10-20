@@ -10,6 +10,11 @@
 #include "simdjson.h"
 #include "../../build/sceneContext.h"
 
+namespace Editor
+{
+  class Viewport3D;
+}
+
 struct SDL_GPUCommandBuffer;
 struct SDL_GPUGraphicsPipeline;
 struct SDL_GPURenderPass;
@@ -27,7 +32,7 @@ namespace Project::Component
   };
 
   typedef void(*FuncCompDraw)(Object&, Entry &entry);
-  typedef void(*FuncCompDraw3D)(Object&, Entry &entry, SDL_GPUCommandBuffer* cmdBuff, SDL_GPURenderPass* pass);
+  typedef void(*FuncCompDraw3D)(Object&, Entry &entry, Editor::Viewport3D &vp, SDL_GPUCommandBuffer* cmdBuff, SDL_GPURenderPass* pass);
   typedef std::shared_ptr<void>(*FuncCompInit)(Object&);
   typedef std::string(*FuncCompSerial)(Entry &entry);
   typedef std::shared_ptr<void>(*FuncCompDeserial)(simdjson::simdjson_result<simdjson::dom::object> &doc);
@@ -51,7 +56,7 @@ namespace Project::Component
     { \
       std::shared_ptr<void> init(Object& obj); \
       void draw(Object& obj, Entry &entry); \
-      void draw3D(Object&, Entry &entry, SDL_GPUCommandBuffer* cmdBuff, SDL_GPURenderPass* pass); \
+      void draw3D(Object&, Entry &entry, Editor::Viewport3D &vp, SDL_GPUCommandBuffer* cmdBuff, SDL_GPURenderPass* pass); \
       std::string serialize(Entry &entry); \
       std::shared_ptr<void> deserialize(simdjson::simdjson_result<simdjson::dom::object> &doc); \
       void build(Object&, Entry &entry, Build::SceneCtx &ctx); \

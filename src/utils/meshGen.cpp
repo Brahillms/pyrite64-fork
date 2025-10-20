@@ -75,3 +75,38 @@ void Utils::Mesh::generateGrid(Renderer::Mesh&mesh, int size) {
   mesh.indices.push_back(mesh.vertLines.size() - 2);
   mesh.indices.push_back(mesh.vertLines.size() - 1);
 }
+
+void Utils::Mesh::addLineBox(
+  Renderer::Mesh&mesh, const glm::vec3&pos, const glm::vec3&halfExtend,
+  const glm::u8vec4 &color
+) {
+  uint16_t startIdx = mesh.vertLines.size();
+
+  glm::vec3 v0 = pos + glm::vec3(-halfExtend.x, -halfExtend.y, -halfExtend.z);
+  glm::vec3 v1 = pos + glm::vec3( halfExtend.x, -halfExtend.y, -halfExtend.z);
+  glm::vec3 v2 = pos + glm::vec3( halfExtend.x,  halfExtend.y, -halfExtend.z);
+  glm::vec3 v3 = pos + glm::vec3(-halfExtend.x,  halfExtend.y, -halfExtend.z);
+  glm::vec3 v4 = pos + glm::vec3(-halfExtend.x, -halfExtend.y,  halfExtend.z);
+  glm::vec3 v5 = pos + glm::vec3( halfExtend.x, -halfExtend.y,  halfExtend.z);
+  glm::vec3 v6 = pos + glm::vec3( halfExtend.x,  halfExtend.y,  halfExtend.z);
+  glm::vec3 v7 = pos + glm::vec3(-halfExtend.x,  halfExtend.y,  halfExtend.z);
+
+  mesh.vertLines.push_back({v0, color});
+  mesh.vertLines.push_back({v1, color});
+  mesh.vertLines.push_back({v2, color});
+  mesh.vertLines.push_back({v3, color});
+  mesh.vertLines.push_back({v4, color});
+  mesh.vertLines.push_back({v5, color});
+  mesh.vertLines.push_back({v6, color});
+  mesh.vertLines.push_back({v7, color});
+
+  constexpr uint16_t INDICES[] = {
+    0,1, 1,2, 2,3, 3,0,
+    4,5, 5,6, 6,7, 7,4,
+    0,4, 1,5, 2,6, 3,7
+  };
+  for (auto idx : INDICES) {
+    mesh.indices.push_back(startIdx + idx);
+  }
+}
+

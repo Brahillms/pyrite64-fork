@@ -2,7 +2,7 @@
 "conf": {"name":"Scene A",
 "fbWidth":320,
 "fbHeight":240,
-"fbFormat":0,"clearColor":[0.8346773982048035,0.660967230796814,0.4981139600276947,1.0],
+"fbFormat":0,"clearColor":[0.28629034757614136,0.28629034757614136,0.28629034757614136,1.0],
 "doClearColor":true,
 "doClearDepth":true},
 "graph": {"id":0,
@@ -20,7 +20,7 @@
 }],"children":[]},
 {"id":1,
 "name":"New Object (1)",
-"uuid":13786383135614671346,"pos":[-1.0,0.0,0.0],"rot":[0.0,0.0,0.0,0.0],"scale":[0.0,0.0,0.0],"components":[{"id":1,
+"uuid":13786383135614671346,"pos":[-1.0,0.0,0.0],"rot":[0.0,0.0,0.0,0.0],"scale":[1.0,1.0,1.0],"components":[{"id":1,
 "uuid":3231469276560982255,
 "name":"Model","data":{"model":8408891455870217598}
 }],"children":[]}]}

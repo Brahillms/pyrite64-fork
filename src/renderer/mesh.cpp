@@ -7,13 +7,20 @@
 #include "scene.h"
 
 void Renderer::Mesh::recreate(Renderer::Scene &scene) {
-  delete vertBuff;
   if (indices.empty())return;
+  //delete vertBuff;
+  if (!vertBuff) {
+    vertBuff = new VertBuffer(ctx.gpu);
+  }
 
-  vertBuff = new VertBuffer(ctx.gpu);
   if (!vertLines.empty()) {
     vertBuff->setData(vertLines, indices);
   } else {
+    aabb.reset();
+    for (const auto& v : vertices) {
+      aabb.addPoint(glm::vec3(v.pos) * (1.0f / 65536.0f));
+    }
+
     vertBuff->setData(vertices, indices);
   }
 
