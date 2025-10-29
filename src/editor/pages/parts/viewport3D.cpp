@@ -189,8 +189,24 @@ void Editor::Viewport3D::onPostRender(Renderer::Scene &renderScene) {
 void Editor::Viewport3D::draw()
 {
   camera.update();
+
   auto scene = ctx.project->getScenes().getLoadedScene();
   if (!scene)return;
+
+  ctx.scene->clearLights();
+  auto &rootObj = scene->getRootObject();
+  for(auto& child : rootObj.children)
+  {
+    for(auto &comp : child->components)
+    {
+      auto &def = Project::Component::TABLE[comp.id];
+      if (def.funcUpdate) {
+        def.funcUpdate(*child, comp);
+      }
+    }
+    //child.draw(renderPass3D, cmdBuff);
+  }
+
   fb.setClearColor(scene->conf.clearColor);
 
   if (pickedObjID.hasResult()) {

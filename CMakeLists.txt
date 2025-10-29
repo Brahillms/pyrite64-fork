@@ -155,6 +155,7 @@ add_executable(p64editor src/main.cpp
         src/renderer/n64/n64Material.h
         src/renderer/n64/n64Material.cpp
         src/renderer/n64/ccMapping.h
+        src/project/component/types/compLight.cpp
 )
 
 target_include_directories(p64editor PRIVATE

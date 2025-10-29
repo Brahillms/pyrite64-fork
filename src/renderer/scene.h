@@ -8,6 +8,8 @@
 #include <SDL3/SDL.h>
 
 #include "pipeline.h"
+#include "glm/vec3.hpp"
+#include "glm/vec4.hpp"
 
 namespace Renderer
 {
@@ -16,6 +18,14 @@ namespace Renderer
   using CbRenderPass = std::function<void(SDL_GPUCommandBuffer*, Scene&)>;
   using CbCopyPass = std::function<void(SDL_GPUCommandBuffer*, SDL_GPUCopyPass*)>;
   using CbPostRender = std::function<void(Scene&)>;
+
+  struct Light
+  {
+    glm::vec4 color{};
+    glm::vec4 pos{};
+    glm::vec3 dir{};
+    int type{};
+  };
 
   class Scene
   {
@@ -31,12 +41,18 @@ namespace Renderer
       std::unique_ptr<Pipeline> pipelineN64{};
       std::unique_ptr<Pipeline> pipelineLines{};
 
+      std::vector<Light> lights{};
+
     public:
       Scene();
       ~Scene();
 
       void update();
       void draw();
+
+      void clearLights() { lights.clear(); }
+      void addLight(const Light& light) { lights.push_back(light); }
+      const std::vector<Light>& getLights() const { return lights; }
 
       void addRenderPass(uint32_t id, const CbRenderPass& pass) { renderPasses[id] = pass; }
       void removeRenderPass(uint32_t id) { renderPasses.erase(id); }

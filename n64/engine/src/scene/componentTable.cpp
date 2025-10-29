@@ -6,6 +6,7 @@
 
 #include "scene/components/code.h"
 #include "scene/components/model.h"
+#include "scene/components/light.h"
 
 #define SET_COMP(name) \
   { \
@@ -20,6 +21,7 @@ namespace P64
   const ComponentDef COMP_TABLE[COMP_TABLE_SIZE] {
     SET_COMP(Code),
     SET_COMP(Model),
+    SET_COMP(Light),
     {}
   };
 }

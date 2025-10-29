@@ -81,6 +81,8 @@ void P64::Scene::update(float deltaTime) {
     cam.update(deltaTime);
   }
 
+  cameras[0].attach(); // @TODO: hack, remove by making proper lighting manager
+
   for(auto obj : objects)
   {
     auto compRefs = obj->getCompRefs();
@@ -117,7 +119,8 @@ void P64::Scene::draw(float deltaTime)
     t3d_screen_clear_color(conf.clearColor);
   }
 
-  t3d_light_set_ambient({0xFF, 0xFF, 0xFF, 0xFF});
+  //t3d_light_set_ambient({0xFF, 0xFF, 0xFF, 0xFF});
+  t3d_light_set_count(2);
 
   // 3D Pass, for every active camera
   for(auto &cam : cameras)

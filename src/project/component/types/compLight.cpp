@@ -1,0 +1,115 @@
+/**
+* @copyright 2025 - Max Bebök
+* @license MIT
+*/
+#include "../components.h"
+#include "../../../context.h"
+#include "../../../editor/imgui/helper.h"
+#include "../../../utils/json.h"
+#include "../../../utils/jsonBuilder.h"
+#include "../../../utils/binaryFile.h"
+#include "../../../utils/logger.h"
+#include "../../assetManager.h"
+#include "../../../editor/pages/parts/viewport3D.h"
+#include "../../../renderer/scene.h"
+#include "../../../utils/meshGen.h"
+
+#define GLM_ENABLE_EXPERIMENTAL
+#include "glm/gtx/matrix_decompose.hpp"
+
+namespace
+{
+  constexpr int LIGHT_TYPE_AMBIENT = 0;
+  constexpr int LIGHT_TYPE_DIRECTIONAL = 1;
+  constexpr int LIGHT_TYPE_POINT = 2;
+  constexpr int LIGHT_TYPE_COUNT = 3;
+
+  constexpr char* const LIGHT_TYPES[LIGHT_TYPE_COUNT] = {
+    "Ambient",
+    "Directional",
+    "Point"
+  };
+
+  glm::vec3 rotToDir(const Project::Object &obj) {
+    return glm::normalize(obj.rot * glm::vec3{0,0,-1});
+  }
+}
+
+namespace Project::Component::Light
+{
+  struct Data
+  {
+    glm::vec4 color{};
+    int index{0};
+    int type{0};
+  };
+
+  std::shared_ptr<void> init(Object &obj) {
+    auto data = std::make_shared<Data>();
+    return data;
+  }
+
+  std::string serialize(Entry &entry) {
+    Data &data = *static_cast<Data*>(entry.data.get());
+    Utils::JSON::Builder builder{};
+    builder.set("index", data.index);
+    builder.set("type", data.type);
+    builder.set("color", data.color);
+    return builder.toString();
+  }
+
+  std::shared_ptr<void> deserialize(simdjson::simdjson_result<simdjson::dom::object> &doc) {
+    auto data = std::make_shared<Data>();
+    data->index = Utils::JSON::readInt(doc, "index");
+    data->type = Utils::JSON::readInt(doc, "type");
+    data->color = Utils::JSON::readColor(doc, "color");
+    return data;
+  }
+
+  void build(Object& obj, Entry &entry, Build::SceneCtx &ctx)
+  {
+    Data &data = *static_cast<Data*>(entry.data.get());
+    auto dir = rotToDir(obj) * 127.0f;
+
+    ctx.fileObj.writeRGBA(data.color);
+    ctx.fileObj.write<uint8_t>(data.index);
+    ctx.fileObj.write<uint8_t>(data.type);
+
+    ctx.fileObj.write<int8_t>(dir.x);
+    ctx.fileObj.write<int8_t>(dir.y);
+    ctx.fileObj.write<int8_t>(dir.z);
+  }
+
+  void update(Object &obj, Entry &entry)
+  {
+    Data &data = *static_cast<Data*>(entry.data.get());
+    ctx.scene->addLight(Renderer::Light{
+      .color = data.color,
+      .pos = glm::vec4{obj.pos, 0.0f},
+      .dir = rotToDir(obj),
+      .type = data.type,
+    });
+  }
+
+  void draw(Object &obj, Entry &entry) {
+    Data &data = *static_cast<Data*>(entry.data.get());
+
+    if (ImGui::InpTable::start("Comp"))
+    {
+      ImGui::InpTable::addString("Name", entry.name);
+      ImGui::InpTable::addComboBox("Type", data.type, LIGHT_TYPES, LIGHT_TYPE_COUNT);
+      ImGui::InpTable::addInputInt("Index", data.index);
+      ImGui::InpTable::addColor("Color", data.color, true);
+
+      ImGui::InpTable::end();
+    }
+  }
+
+  void draw3D(Object& obj, Entry &entry, Editor::Viewport3D &vp, SDL_GPUCommandBuffer* cmdBuff, SDL_GPURenderPass* pass)
+  {
+    Data &data = *static_cast<Data*>(entry.data.get());
+
+    //Utils::Mesh::addLineBox(*vp.getLines(), center, halfExt, aabbCol);
+    //Utils::Mesh::addLineBox(*vp.getLines(), center, halfExt + 0.002f, aabbCol);
+  }
+}

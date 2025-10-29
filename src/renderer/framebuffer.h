@@ -5,7 +5,6 @@
 #pragma once
 #include <SDL3/SDL.h>
 
-#include "../utils/color.h"
 #include "glm/vec4.hpp"
 
 namespace Renderer
@@ -29,7 +28,7 @@ namespace Renderer
       Framebuffer();
       ~Framebuffer();
 
-      void setClearColor(const Utils::Color &color) {
+      void setClearColor(const glm::vec4 &color) {
         targetInfo[0].clear_color.r = color.r;
         targetInfo[0].clear_color.g = color.g;
         targetInfo[0].clear_color.b = color.b;

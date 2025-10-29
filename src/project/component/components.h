@@ -44,6 +44,7 @@ namespace Project::Component
     const char* icon{};
     const char* name{};
     FuncCompInit funcInit{};
+    FuncCompDraw funcUpdate{};
     FuncCompDraw funcDraw{};
     FuncCompDraw3D funcDraw3D{};
     FuncCompSerial funcSerialize{};
@@ -55,6 +56,7 @@ namespace Project::Component
     namespace name \
     { \
       std::shared_ptr<void> init(Object& obj); \
+      void update(Object& obj, Entry &entry); \
       void draw(Object& obj, Entry &entry); \
       void draw3D(Object&, Entry &entry, Editor::Viewport3D &vp, SDL_GPUCommandBuffer* cmdBuff, SDL_GPURenderPass* pass); \
       std::string serialize(Entry &entry); \
@@ -64,6 +66,7 @@ namespace Project::Component
 
   MAKE_COMP(Code)
   MAKE_COMP(Model)
+  MAKE_COMP(Light)
 
   constexpr std::array TABLE{
     CompInfo{
@@ -86,6 +89,18 @@ namespace Project::Component
       .funcSerialize = Model::serialize,
       .funcDeserialize = Model::deserialize,
       .funcBuild = Model::build
+    },
+    CompInfo{
+      .id = 2,
+      .icon = ICON_FA_LIGHTBULB_O " ",
+      .name = "Light",
+      .funcInit = Light::init,
+      .funcUpdate = Light::update,
+      .funcDraw = Light::draw,
+      .funcDraw3D = Light::draw3D,
+      .funcSerialize = Light::serialize,
+      .funcDeserialize = Light::deserialize,
+      .funcBuild = Light::build
     },
   };
 }

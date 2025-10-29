@@ -43,4 +43,5 @@ add_executable(n64_engine
         engine/src/assets/assetManager.cpp
         engine/include/assets/assetTypes.h
         engine/src/scene/object.cpp
+        engine/include/scene/components/light.h
 )

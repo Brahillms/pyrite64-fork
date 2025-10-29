@@ -10,7 +10,6 @@
 #include <stdexcept>
 #include <cstdint>
 
-#include "color.h"
 #include "glm/vec3.hpp"
 #include "glm/vec4.hpp"
 
@@ -77,14 +76,14 @@ namespace Utils
         write(v.w);
       }
 
-      void writeRGBA(const Color &color) {
+      void writeRGBA(const glm::vec4 &color) {
         write<uint8_t>(color.r * 255);
         write<uint8_t>(color.g * 255);
         write<uint8_t>(color.b * 255);
         write<uint8_t>(color.a * 255);
       }
 
-      void writeRGB(const Color &color) {
+      void writeRGB(const glm::vec4 &color) {
         write<uint8_t>(color.r * 255);
         write<uint8_t>(color.g * 255);
         write<uint8_t>(color.b * 255);

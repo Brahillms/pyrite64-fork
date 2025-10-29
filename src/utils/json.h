@@ -40,7 +40,8 @@ namespace Utils::JSON
     return std::string{str->data(), str->length()};
   }
 
-  inline int readInt(const simdjson::simdjson_result<simdjson::dom::element> &el, const std::string &key) {
+  template<typename T>
+  inline int readInt(const simdjson::simdjson_result<T> &el, const std::string &key) {
     auto val = el[key];
     if (val.error() != simdjson::SUCCESS) {
       return 0;
@@ -88,8 +89,9 @@ namespace Utils::JSON
     return *b;
   }
 
-  inline Color readColor(const simdjson::simdjson_result<simdjson::dom::element> &el, const std::string &key) {
-    Color col{};
+  template<typename T>
+  inline glm::vec4 readColor(const simdjson::simdjson_result<T> &el, const std::string &key) {
+    glm::vec4 col{};
     auto val = el[key];
     if (val.error() != simdjson::SUCCESS) {
       return col;

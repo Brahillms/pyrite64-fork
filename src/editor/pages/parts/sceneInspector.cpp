@@ -5,7 +5,6 @@
 #include "sceneInspector.h"
 #include "../../../context.h"
 #include "imgui.h"
-#include "../../../utils/color.h"
 #include "misc/cpp/imgui_stdlib.h"
 #include "../../imgui/helper.h"
 

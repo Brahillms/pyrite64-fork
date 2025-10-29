@@ -8,9 +8,9 @@
 #include "misc/cpp/imgui_stdlib.h"
 #include "IconsFontAwesome4.h"
 #include "../../utils/filePicker.h"
-#include "../../utils/color.h"
 #include "glm/vec3.hpp"
 #include "glm/gtc/quaternion.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 namespace ImGui::InpTable
 {
@@ -80,12 +80,12 @@ namespace ImGui::InpTable
     return ImGui::InputInt(labelHidden.c_str(), &value);
   }
 
-  inline void addColor(const std::string &name, Utils::Color &color, bool withAlpha = true) {
+  inline void addColor(const std::string &name, glm::vec4 &color, bool withAlpha = true) {
     add(name);
     if (withAlpha) {
-      ImGui::ColorEdit4(name.c_str(), color.rgba, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+      ImGui::ColorEdit4(name.c_str(), glm::value_ptr(color), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
     } else {
-      ImGui::ColorEdit3(name.c_str(), color.rgba, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+      ImGui::ColorEdit3(name.c_str(), glm::value_ptr(color), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
     }
   }
 

@@ -4,7 +4,6 @@
 */
 #pragma once
 #include "simdjson.h"
-#include "color.h"
 #include "glm/vec3.hpp"
 #include "glm/gtc/quaternion.hpp"
 
@@ -45,7 +44,8 @@ namespace Utils::JSON
         hasData = true;
       }
 
-      void set(const std::string &key, const glm::quat &vec) {
+
+      void set(const std::string &key, const glm::vec4 &vec) {
         if (hasData)builder.append_comma();
 
         builder.escape_and_append_with_quotes(key);
@@ -60,16 +60,16 @@ namespace Utils::JSON
         hasData = true;
       }
 
-      void set(const std::string &key, const Color &col) {
+      void set(const std::string &key, const glm::quat &vec) {
         if (hasData)builder.append_comma();
 
         builder.escape_and_append_with_quotes(key);
         builder.append_colon();
         builder.start_array();
-          builder.append(col.r); builder.append_comma();
-          builder.append(col.g); builder.append_comma();
-          builder.append(col.b); builder.append_comma();
-          builder.append(col.a);
+        builder.append(vec.x); builder.append_comma();
+        builder.append(vec.y); builder.append_comma();
+        builder.append(vec.z); builder.append_comma();
+        builder.append(vec.w);
         builder.end_array();
 
         hasData = true;

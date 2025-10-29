@@ -9,7 +9,6 @@
 #include <vector>
 
 #include "object.h"
-#include "../../utils/color.h"
 
 namespace Project
 {
@@ -19,7 +18,7 @@ namespace Project
     int fbWidth{320};
     int fbHeight{240};
     int fbFormat{0};
-    Utils::Color clearColor{};
+    glm::vec4 clearColor{};
     bool doClearColor{};
     bool doClearDepth{};
 
