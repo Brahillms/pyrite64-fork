@@ -86,6 +86,8 @@ void P64::Scene::update(float deltaTime) {
 
   for(auto obj : objects)
   {
+    if(!obj->isEnabled())continue;
+
     auto compRefs = obj->getCompRefs();
 
     for (uint32_t i=0; i<obj->compCount; ++i) {
@@ -147,6 +149,7 @@ void P64::Scene::draw(float deltaTime)
 
     for(auto obj : objects)
     {
+      if(!obj->isEnabled())continue;
       auto compRefs = obj->getCompRefs();
 
       for (uint32_t i=0; i<obj->compCount; ++i) {
@@ -172,4 +175,20 @@ void P64::Scene::draw(float deltaTime)
 void P64::Scene::removeObject(Object &obj)
 {
   pendingObjDelete.push_back(&obj);
+}
+
+void P64::Scene::setGroupEnabled(uint16_t groupId, bool enabled) const
+{
+  if(groupId == 0)return;
+
+  for(auto obj : objects)
+  {
+    if (groupId == obj->id) {
+      obj->setFlag(ObjectFlags::SELF_ACTIVE, enabled);
+    }
+    if (groupId == obj->group) {
+      //debugf("-> obj %d active = %d\n", obj->id, enabled);
+      obj->setFlag(ObjectFlags::PARENTS_ACTIVE, enabled);
+    }
+  }
 }

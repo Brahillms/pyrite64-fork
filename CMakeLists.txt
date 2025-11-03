@@ -99,7 +99,6 @@ add_executable(p64editor src/main.cpp
         src/editor/pages/parts/assetInspector.cpp
         src/editor/pages/parts/assetInspector.h
         src/utils/textureFormats.h
-        src/editor/pages/parts/sceneBrowser.cpp
         src/project/scene/sceneManager.h
         src/project/scene/sceneManager.cpp
         src/project/scene/scene.h
@@ -159,6 +158,7 @@ add_executable(p64editor src/main.cpp
         src/project/component/types/compCamera.cpp
         src/editor/imgui/helper.cpp
         src/editor/imgui/helper.cpp
+        n64/engine/include/scene/objectFlags.h
 )
 
 target_include_directories(p64editor PRIVATE
@@ -172,6 +172,7 @@ target_include_directories(p64editor PRIVATE
     vendored/glm
     vendored/ImGuizmo
     vendored/tiny3d/tools/gltf_importer/src/lib
+    n64
 )
 
 # Link to the actual SDL3 library.

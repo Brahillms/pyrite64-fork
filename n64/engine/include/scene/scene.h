@@ -70,6 +70,8 @@ namespace P64
 
       void removeObject(Object &obj);
 
+      void setGroupEnabled(uint16_t groupId, bool enabled) const;
+
       [[nodiscard]] Lighting& getLighting() { return lighting; }
   };
 }

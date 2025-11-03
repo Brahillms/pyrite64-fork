@@ -76,8 +76,7 @@ void Editor::Scene::draw()
     ImGui::DockBuilderDockWindow("Object", dockRightID);
 
     // Bottom
-    ImGui::DockBuilderDockWindow("Scenes", dockBottomID);
-    ImGui::DockBuilderDockWindow("Assets", dockBottomID);
+    ImGui::DockBuilderDockWindow("Files", dockBottomID);
     ImGui::DockBuilderDockWindow("Log", dockBottomID);
 
 
@@ -98,12 +97,8 @@ void Editor::Scene::draw()
     assetInspector.draw();
   ImGui::End();
 
-  ImGui::Begin("Assets");
-  assetsBrowser.draw();
-  ImGui::End();
-
-  ImGui::Begin("Scenes");
-    sceneBrowser.draw();
+  ImGui::Begin("Files");
+    assetsBrowser.draw();
   ImGui::End();
 
   if (ctx.project->getScenes().getLoadedScene()) {

@@ -8,7 +8,6 @@
 #include "parts/logWindow.h"
 #include "parts/objectInspector.h"
 #include "parts/projectSettings.h"
-#include "parts/sceneBrowser.h"
 #include "parts/sceneGraph.h"
 #include "parts/sceneInspector.h"
 #include "parts/viewport3D.h"
@@ -23,7 +22,6 @@ namespace Editor
       // Editors
       ProjectSettings projectSettings{};
       AssetsBrowser assetsBrowser{};
-      SceneBrowser sceneBrowser{};
       AssetInspector assetInspector{};
       SceneInspector sceneInspector{};
       ObjectInspector objectInspector{};

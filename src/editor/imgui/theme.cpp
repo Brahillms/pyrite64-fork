@@ -77,7 +77,7 @@ void ImGui::applyTheme()
 
   // Style tweaks
   constexpr float rounding = 3.0f;
-  style.TabBarOverlineSize = 3.0f;
+  style.TabBarOverlineSize = 2.0f;
   style.WindowRounding = rounding;
   style.FrameRounding = rounding;
   style.GrabRounding = rounding;

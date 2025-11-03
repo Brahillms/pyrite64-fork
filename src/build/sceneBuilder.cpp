@@ -10,6 +10,8 @@
 #include "../utils/fs.h"
 #include "../utils/logger.h"
 
+#include "engine/include/scene/objectFlags.h"
+
 namespace fs = std::filesystem;
 
 namespace
@@ -29,18 +31,26 @@ void Build::buildScene(Project::Project &project, const Project::SceneEntry &sce
 
   auto fsDataPath = fs::absolute(fs::path{project.getPath()} / "filesystem" / "p64");
 
-  uint32_t flags = 0;
+  uint32_t sceneFlags = 0;
   uint32_t objCount = sc->objectsMap.size();
 
-  if (sc->conf.doClearDepth)flags |= FLAG_CLR_DEPTH;
-  if (sc->conf.doClearColor)flags |= FLAG_CLR_COLOR;
-  if (sc->conf.fbFormat)flags |= FLAG_SCR_32BIT;
+  if (sc->conf.doClearDepth)sceneFlags |= FLAG_CLR_DEPTH;
+  if (sc->conf.doClearColor)sceneFlags |= FLAG_CLR_COLOR;
+  if (sc->conf.fbFormat)sceneFlags |= FLAG_SCR_32BIT;
 
   ctx.fileObj = {};
-  for (auto objEntry : sc->objectsMap) {
+  for (auto objEntry : sc->objectsMap)
+  {
     auto &obj = *objEntry.second;
-    ctx.fileObj.write<uint16_t>(0); // @TODO type
+
+    uint16_t objFlags = 0;
+    if(obj.enabled)objFlags |= P64::ObjectFlags::ACTIVE;
+    if(obj.isGroup)objFlags |= P64::ObjectFlags::IS_GROUP;
+
+    ctx.fileObj.write<uint16_t>(objFlags); // @TODO type
     ctx.fileObj.write<uint16_t>(obj.id);
+    ctx.fileObj.write<uint16_t>(obj.parent ? obj.parent->id : 0);
+    ctx.fileObj.write<uint16_t>(0); // padding
     ctx.fileObj.write(obj.pos);
     ctx.fileObj.write(obj.scale);
 
@@ -76,7 +86,7 @@ void Build::buildScene(Project::Project &project, const Project::SceneEntry &sce
   ctx.fileScene = {};
   ctx.fileScene.write<uint16_t>(sc->conf.fbWidth);
   ctx.fileScene.write<uint16_t>(sc->conf.fbHeight);
-  ctx.fileScene.write(flags);
+  ctx.fileScene.write(sceneFlags);
   ctx.fileScene.writeRGBA(sc->conf.clearColor);
   ctx.fileScene.write(objCount);
 

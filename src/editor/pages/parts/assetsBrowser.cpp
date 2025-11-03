@@ -5,6 +5,7 @@
 #include "assetsBrowser.h"
 
 #include "imgui.h"
+#include "../../imgui/theme.h"
 #include "../../../context.h"
 
 using FileType = Project::AssetManager::FileType;
@@ -13,9 +14,18 @@ namespace
 {
   constexpr int ICON_MAX_SIZE = 64;
 
-  constexpr int TAB_IDX_ASSETS = 0;
-  constexpr int TAB_IDX_SCRIPTS = 1;
-  constexpr int TAB_IDX_PREFABS = 2;
+  constexpr int TAB_IDX_SCENES = 0;
+  constexpr int TAB_IDX_ASSETS = 1;
+  constexpr int TAB_IDX_SCRIPTS = 2;
+  constexpr int TAB_IDX_PREFABS = 3;
+
+  struct TabDef
+  {
+    const char* name;
+    std::vector<FileType> fileTypes{};
+    bool showScenes{false};
+  };
+
 }
 
 Editor::AssetsBrowser::AssetsBrowser()
@@ -33,27 +43,44 @@ Editor::AssetsBrowser::~AssetsBrowser() {
 
 void Editor::AssetsBrowser::draw() {
   auto &assets = ctx.project->getAssets().getEntries();
+  auto &scenes = ctx.project->getScenes().getEntries();
 
-  const char* TABS[] = {
-    ICON_MDI_FILE "  Assets",
-    ICON_MDI_SCRIPT_OUTLINE "  Scripts",
-    ICON_MDI_CUBE_OUTLINE "  Prefabs"
+  const std::array<TabDef, 4> TABS{
+    TabDef{
+      .name = ICON_MDI_EARTH_BOX "  Scenes",
+      .showScenes = true
+    },
+    TabDef{
+      .name = ICON_MDI_FILE "  Assets",
+      .fileTypes = {FileType::IMAGE, FileType::AUDIO, FileType::MODEL_3D}
+    },
+    TabDef{
+      .name = ICON_MDI_SCRIPT_OUTLINE "  Scripts",
+      .fileTypes = {FileType::CODE}
+    },
+    TabDef{
+      .name = ICON_MDI_CUBE_OUTLINE "  Prefabs",
+      .fileTypes = {FileType::PREFAB}
+    },
   };
 
   ImGui::BeginChild("LEFT", ImVec2(94, 0), ImGuiChildFlags_Border);
-  for (int i=0; i<3; ++i) {
+  for (int i=0; i<TABS.size(); ++i) {
     bool isActive = i == activeTab;
-    if (ImGui::Selectable(TABS[i], isActive))activeTab = i;
+    if (ImGui::Selectable(TABS[i].name, isActive))activeTab = i;
   }
   ImGui::EndChild();
+
+  const auto &tab = TABS[activeTab];
 
   ImGui::SameLine();
   ImGui::BeginChild("RIGHT");
 
   auto availWidth = ImGui::GetContentRegionAvail().x - 4;
-  float imageSize = 64;
+  float imageSize = 48;
   float itemWidth = imageSize + 18;
   float currentWidth = 0.0f;
+  ImVec2 textBtnSize{imageSize+12, imageSize+8};
 
   auto checkLineBreak = [&]() {
     if ((currentWidth+itemWidth) > availWidth) {
@@ -64,16 +91,10 @@ void Editor::AssetsBrowser::draw() {
     currentWidth += itemWidth;
   };
 
-  for (const auto &typed : assets) {
-    for (const auto &asset : typed)
+  for(const auto type : tab.fileTypes)
+  {
+    for (const auto &asset : ctx.project->getAssets().getTypeEntries(type))
     {
-      if (asset.type == FileType::CODE) {
-        if (activeTab != TAB_IDX_SCRIPTS)continue;
-      } else {
-        if (activeTab == TAB_IDX_SCRIPTS)continue;
-      }
-
-      if (asset.type == FileType::UNKNOWN)continue;
       checkLineBreak();
 
       auto icon = ImTextureRef(iconFile.getGPUTex());
@@ -120,15 +141,46 @@ void Editor::AssetsBrowser::draw() {
     }
   }
 
-  if (activeTab == TAB_IDX_SCRIPTS)
+  if(tab.showScenes)
+  {
+    for (const auto &scene : scenes)
+    {
+      checkLineBreak();
+
+      auto icon = ImTextureRef(iconFile.getGPUTex());
+      int selId = ctx.project->getScenes().getLoadedScene()->getId();
+
+      bool isSelected = (selId == scene.id);
+      if(isSelected) {
+        ImGui::PushStyleColor(ImGuiCol_Button, {0.5f,0.5f,0.7f,1});
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, {0.5f,0.5f,0.7f,0.8f});
+      }
+
+      if (ImGui::Button(scene.name.c_str(), textBtnSize)) {
+        ctx.project->getScenes().loadScene(scene.id);
+      }
+
+      if(isSelected)ImGui::PopStyleColor(2);
+    }
+  }
+
+  if (activeTab == TAB_IDX_SCRIPTS || activeTab == TAB_IDX_SCENES)
   {
     checkLineBreak();
-    if (ImGui::ImageButton("Add", ImTextureRef(iconCodeAdd.getGPUTex()),
-     {imageSize, imageSize}, {0,0}, {1,1}, {0,0,0,0}, {1,1,1,1.0f}
+    // set textsize to larger
+
+    ImGui::PushFont(nullptr, 32.0f);
+    if (ImGui::Button(
+      (activeTab == TAB_IDX_SCRIPTS) ? ICON_MDI_FILE_DOCUMENT_PLUS_OUTLINE : ICON_MDI_EARTH_BOX_PLUS,
+      textBtnSize
     )) {
-      // ask name in popup
-      ImGui::OpenPopup("NewScript");
+      if(activeTab == TAB_IDX_SCRIPTS) {
+        ImGui::OpenPopup("NewScript");
+      } else {
+        ctx.project->getScenes().add();
+      }
     }
+    ImGui::PopFont();
   }
 
   if(ImGui::BeginPopup("NewScript"))

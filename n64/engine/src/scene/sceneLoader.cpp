@@ -22,8 +22,10 @@ namespace {
   constexpr uint16_t OBJ_TYPE_CAMERA = 1;
 
   struct ObjectEntry {
-    uint16_t type;
+    uint16_t flags;
     uint16_t id;
+    uint16_t group;
+    uint16_t _padding;
     fm_vec3_t pos;
     fm_vec3_t scale;
     // data follows
@@ -69,14 +71,8 @@ void P64::Scene::loadScene() {
   //debugf("Objects: %lu\n", conf.objectCount);
   if(conf.objectCount)
   {
-/*
-    objStaticMats = (T3DMat4FP*)(loadSubFile('m'));
-    auto currStaticMats = objStaticMats;
-    data_cache_hit_writeback(objStaticMats, conf.objectCount * sizeof(T3DMat4FP));
-*/
     auto *objFileStart = (uint8_t*)(loadSubFile('o'));
 
-    // pre-scan objects to get counts
     auto *objFile = objFileStart;
     //cameras.resize(camCount);
 
@@ -86,88 +82,71 @@ void P64::Scene::loadScene() {
     {
       ObjectEntry* objEntry = (ObjectEntry*)objFile;
 
-      //debugf("OBJECT: id=%d type=%d\n", objEntry->id, objEntry->type);
+      // pre-scan components to get total allocation size
+      uint32_t allocSize = sizeof(Object);
 
-      switch (objEntry->type)
-      {
-        case OBJ_TYPE_OBJECT: {
+      auto ptrIn = objFile + sizeof(ObjectEntry);
+      uint32_t compCount = 0;
+      while(ptrIn[1] != 0) {
+        auto compId = ptrIn[0];
+        auto argSize = ptrIn[1] * 4;
 
-          // pre-scan components to get total allocation size
-          uint32_t allocSize = sizeof(Object);
-          auto ptrIn = objFile + sizeof(ObjectEntry);
-          uint32_t compCount = 0;
-          while(ptrIn[1] != 0) {
-            auto compId = ptrIn[0];
-            auto argSize = ptrIn[1] * 4;
+        const auto &compDef = COMP_TABLE[compId];
+        assertf(compDef.getAllocSize != nullptr, "Component %d unknown!", compId);
+        allocSize += compDef.getAllocSize(ptrIn + 4);
+        allocSize += sizeof(Object::CompRef);
 
-            const auto &compDef = COMP_TABLE[compId];
-            assertf(compDef.getAllocSize != nullptr, "Component %d unknown!", compId);
-            allocSize += compDef.getAllocSize(ptrIn + 4);
-            allocSize += sizeof(Object::CompRef);
-
-            ptrIn += argSize;
-            ++compCount;
-          }
-
-          void* objMem = malloc(allocSize); // @TODO: custom allocator
-          auto objCompTablePtr = (Object::CompRef*)((char*)objMem + sizeof(Object));
-          auto objCompDataPtr = (char*)(objCompTablePtr) + (sizeof(Object::CompRef) * compCount);
-
-          Object* obj = new(objMem) Object();
-          obj->id = objEntry->id;
-          obj->compCount = compCount;
-          obj->pos = objEntry->pos;
-          obj->scale = objEntry->scale;
-
-          ptrIn = objFile + sizeof(ObjectEntry);
-          while(ptrIn[1] != 0)
-          {
-            uint8_t compId = ptrIn[0];
-            uint8_t argSize = ptrIn[1] * 4;
-
-            const auto &compDef = COMP_TABLE[compId];
-            //debugf("Alloc: %lu bytes for comp %d (arg: %d)\n", compDef.allocSize, compId, argSize);
-
-            objCompTablePtr->type = compId;
-            objCompTablePtr->flags = 0;
-            objCompTablePtr->offset = objCompDataPtr - (char*)obj;
-            ++objCompTablePtr;
-
-            compDef.initDel(*obj, objCompDataPtr, ptrIn + 4);
-            objCompDataPtr += compDef.getAllocSize(ptrIn + 4);
-            ptrIn += argSize;
-          }
-
-          objects.push_back(obj);
-          objFile = ptrIn + 4;
-
-        } break;
-/*
-        case OBJ_TYPE_CAMERA: {
-          auto* objCam = (ObjectEntryCamera*)objEntry;
-          auto &cam = cameras[camIdx++];
-          cam.setPos(objCam->pos);
-          cam.fov  = objCam->fov;
-          cam.near = objCam->near;
-          cam.far  = objCam->far;
-          for(auto &vp : cam.viewports)
-          {
-            vp = t3d_viewport_create();
-            t3d_viewport_set_area(vp,
-              objCam->vpOffset[0], objCam->vpOffset[1],
-              objCam->vpSize[0], objCam->vpSize[1]
-            );
-          }
-        } break;
-*/
-        default:
-          debugf("Unknown object type: %04X\n", objEntry->type);
-          break;
+        ptrIn += argSize;
+        ++compCount;
       }
 
+      void* objMem = malloc(allocSize); // @TODO: custom allocator
+
+      auto objCompTablePtr = (Object::CompRef*)((char*)objMem + sizeof(Object));
+      auto objCompDataPtr = (char*)(objCompTablePtr) + (sizeof(Object::CompRef) * compCount);
+
+      Object* obj = new(objMem) Object();
+      obj->id = objEntry->id;
+      obj->group = objEntry->group;
+      obj->flags = objEntry->flags;
+      obj->compCount = compCount;
+      obj->pos = objEntry->pos;
+      obj->scale = objEntry->scale;
+
+      ptrIn = objFile + sizeof(ObjectEntry);
+      while(ptrIn[1] != 0)
+      {
+        uint8_t compId = ptrIn[0];
+        uint8_t argSize = ptrIn[1] * 4;
+
+        const auto &compDef = COMP_TABLE[compId];
+        //debugf("Alloc: %lu bytes for comp %d (arg: %d)\n", compDef.allocSize, compId, argSize);
+
+        objCompTablePtr->type = compId;
+        objCompTablePtr->flags = 0;
+        objCompTablePtr->offset = objCompDataPtr - (char*)obj;
+        ++objCompTablePtr;
+
+        compDef.initDel(*obj, objCompDataPtr, ptrIn + 4);
+        objCompDataPtr += compDef.getAllocSize(ptrIn + 4);
+        ptrIn += argSize;
+      }
+
+      objects.push_back(obj);
+      objFile = ptrIn + 4;
     }
 
     free(objFileStart);
-    assert(cameras.size() != 0);
+  }
+
+  // update groups
+  for(auto obj : objects)
+  {
+    if(obj->isGroup())
+    {
+      bool groupActive = obj->isSelfEnabled();
+      debugf("Updating group %d | a:%d\n", obj->id, groupActive);
+      setGroupEnabled(obj->id, groupActive);
+    }
   }
 }
