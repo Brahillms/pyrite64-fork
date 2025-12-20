@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "simdjson.h"
+#include "../../utils/prop.h"
 #include "../component/components.h"
 #include "glm/vec3.hpp"
 #include "glm/gtc/quaternion.hpp"
@@ -26,9 +27,11 @@ namespace Project
       uint32_t uuid{0};
       uint16_t id{};
 
-      glm::vec3 pos{};
-      glm::quat rot{};
-      glm::vec3 scale{};
+      PROP_U32(uuidPrefab);
+
+      PROP_VEC3(pos);
+      PROP_QUAT(rot);
+      PROP_VEC3(scale);
 
       bool enabled{true};
       bool selectable{true};

@@ -59,7 +59,7 @@ std::shared_ptr<Project::Object> Project::Scene::addObject(std::string &objJson)
   obj->id = nextUUID++;
   obj->name += " ("+std::to_string(obj->id)+")";
   obj->uuid = Utils::Hash::sha256_64bit(obj->name + std::to_string(rand()));
-  obj->pos += glm::vec3{10.0f, 0.0f, 0.0f};
+  obj->pos.value += glm::vec3{10.0f, 0.0f, 0.0f};
   return addObject(root, obj);
 }
 
@@ -68,8 +68,8 @@ std::shared_ptr<Project::Object> Project::Scene::addObject(Object &parent) {
   child->id = nextUUID++;
   child->name = "New Object ("+std::to_string(child->id)+")";
   child->uuid = Utils::Hash::sha256_64bit(child->name + std::to_string(rand()));
-  child->scale = {DEF_MODEL_SCALE, DEF_MODEL_SCALE, DEF_MODEL_SCALE};
-  child->rot = glm::identity<glm::quat>();
+  child->scale.value = {DEF_MODEL_SCALE, DEF_MODEL_SCALE, DEF_MODEL_SCALE};
+  child->rot.value = glm::identity<glm::quat>();
   return addObject(parent, child);
 }
 

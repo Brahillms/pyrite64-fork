@@ -80,7 +80,7 @@ namespace Project::Component::CollBody
 
     if(data.type == 0) // Box
     {
-     glm::vec3 center = obj.pos + data.offset;
+     glm::vec3 center = obj.pos.value + data.offset;
      glm::vec3 halfExt = data.halfExtend;
 
      glm::vec4 aabbCol{0.0f, 1.0f, 1.0f, 1.0f};
@@ -89,7 +89,7 @@ namespace Project::Component::CollBody
      Utils::Mesh::addLineBox(*vp.getLines(), center, halfExt + 0.002f, aabbCol);
     } else if(data.type == 1) // Sphere
     {
-      Utils::Mesh::addLineSphere(*vp.getLines(), obj.pos + data.offset, data.halfExtend, glm::vec4{0.0f, 1.0f, 1.0f, 1.0f});
+      Utils::Mesh::addLineSphere(*vp.getLines(), obj.pos.value + data.offset, data.halfExtend, glm::vec4{0.0f, 1.0f, 1.0f, 1.0f});
     }
   }
 }

@@ -89,7 +89,7 @@ namespace ImGui::InpTable
     ImGui::TableNextRow();
     ImGui::TableSetColumnIndex(0);
     ImGui::AlignTextToFramePadding();
-    ImGui::Text(name.c_str());
+    ImGui::Text("%s", name.c_str());
     ImGui::TableSetColumnIndex(1);
   }
 

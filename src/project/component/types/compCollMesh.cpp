@@ -121,7 +121,7 @@ namespace Project::Component::CollMesh
     // @TODO: tidy-up
     glm::vec3 skew{0,0,0};
     glm::vec4 persp{0,0,0,1};
-    data.obj3D.uniform.modelMat = glm::recompose(obj.scale, obj.rot, obj.pos, skew, persp);
+    data.obj3D.uniform.modelMat = glm::recompose(obj.scale.resolve(), obj.rot.resolve(), obj.pos.resolve(), skew, persp);
     data.obj3D.uniform.mat.flags |= DRAW_SHADER_COLLISION;
 
     data.obj3D.draw(pass, cmdBuff);
@@ -129,8 +129,8 @@ namespace Project::Component::CollMesh
     bool isSelected = ctx.selObjectUUID == obj.uuid;
     if (isSelected)
     {
-      auto center = obj.pos + (data.aabb.getCenter() * obj.scale * (float)0xFFFF);
-      auto halfExt = data.aabb.getHalfExtend() * obj.scale * (float)0xFFFF;
+      auto center = obj.pos.resolve() + (data.aabb.getCenter() * obj.scale.resolve() * (float)0xFFFF);
+      auto halfExt = data.aabb.getHalfExtend() * obj.scale.resolve() * (float)0xFFFF;
 
       glm::u8vec4 aabbCol{0xAA,0xAA,0xAA,0xFF};
       if (isSelected) {

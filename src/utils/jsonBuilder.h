@@ -30,6 +30,12 @@ namespace Utils::JSON
         hasData = true;
       }
 
+      template<typename PROP>
+      Builder& set(const Property<PROP> &prop) {
+        set(prop.name, prop.value);
+        return *this;
+      }
+
       void set(const std::string &key, const glm::ivec2 &vec) {
         if (hasData)builder.append_comma();
 

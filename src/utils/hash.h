@@ -22,4 +22,20 @@ namespace Utils::Hash
   inline uint32_t sha256_32bit(const std::string& str) {
     return static_cast<uint32_t>(sha256_64bit(str) & 0xFFFFFFFF);
   }
+
+  constexpr uint64_t crc64(const std::string& str)
+  {
+    uint64_t crc = 0xFFFFFFFFFFFFFFFF;
+    for (char c : str) {
+      crc ^= static_cast<uint8_t>(c);
+      for (int i = 0; i < 8; i++) {
+        if (crc & 1) {
+          crc = (crc >> 1) ^ 0xC96C5795D7870F42;
+        } else {
+          crc >>= 1;
+        }
+      }
+    }
+    return crc;
+  }
 }

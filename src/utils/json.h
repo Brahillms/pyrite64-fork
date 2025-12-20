@@ -53,7 +53,8 @@ namespace Utils::JSON
     return (int)(*i);
   }
 
-  inline uint64_t readU64(const simdjson::simdjson_result<simdjson::dom::element> &el, const std::string &key, uint64_t def = 0) {
+  template<typename T>
+  inline uint64_t readU64(const simdjson::simdjson_result<T> &el, const std::string &key, uint64_t def = 0) {
     auto val = el[key];
     if (val.error() != simdjson::SUCCESS) {
       return def;
@@ -155,5 +156,39 @@ namespace Utils::JSON
     res.z = arr.at(2).get_double();
     res.w = arr.at(3).get_double();
     return res;
+  }
+
+  template<typename T, typename PROP>
+  inline void readProp(const simdjson::simdjson_result<T> &el, Property<PROP> &prop, const PROP& defValue = PROP{}) {
+    PROP val{};
+    if constexpr (std::is_same_v<PROP, bool>) {
+      val = readBool(el, prop.name, defValue);
+    }
+    else if constexpr (std::is_same_v<PROP, uint32_t>) {
+      val = readU32(el, prop.name, defValue);
+    }
+    else if constexpr (std::is_same_v<PROP, uint64_t>) {
+      val = readU64(el, prop.name, defValue);
+    }
+    else if constexpr (std::is_same_v<PROP, int32_t>) {
+      val = readInt(el, prop.name, defValue);
+    }
+    else if constexpr (std::is_same_v<PROP, int64_t>) {
+      val = (int64_t)readInt(el, prop.name, defValue);
+    }
+    else if constexpr (std::is_same_v<PROP, float>) {
+      val = readFloat(el, prop.name, defValue);
+    }
+    else if constexpr (std::is_same_v<PROP, glm::vec3>) {
+      val = readVec3(el, prop.name, defValue);
+    }
+    else if constexpr (std::is_same_v<PROP, glm::vec4>) {
+      val = readColor(el, prop.name, defValue);
+    }
+    else if constexpr (std::is_same_v<PROP, glm::quat>) {
+      val = readQuat(el, prop.name);
+    }
+
+    prop.value = val;
   }
 }

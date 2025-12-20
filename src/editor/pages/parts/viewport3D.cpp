@@ -424,7 +424,7 @@ void Editor::Viewport3D::draw()
     glm::vec3 skew{0,0,0};
     glm::vec4 persp{0,0,0,1};
 
-    gizmoMat = glm::recompose(obj->scale, obj->rot, obj->pos, skew, persp);
+    gizmoMat = glm::recompose(obj->scale.value, obj->rot.value, obj->pos.value, skew, persp);
 
     glm::vec3 snap(10.0f);
     if (gizmoOp == 1) {
@@ -443,9 +443,9 @@ void Editor::Viewport3D::draw()
     )) {
       glm::decompose(
         gizmoMat,
-        obj->scale,
-        obj->rot,
-        obj->pos,
+        obj->scale.value,
+        obj->rot.value,
+        obj->pos.value,
         skew, persp
       );
     }

@@ -24,14 +24,14 @@ namespace
   constexpr int LIGHT_TYPE_POINT = 2;
   constexpr int LIGHT_TYPE_COUNT = 3;
 
-  constexpr char* const LIGHT_TYPES[LIGHT_TYPE_COUNT] = {
+  constexpr const char* const LIGHT_TYPES[LIGHT_TYPE_COUNT] = {
     "Ambient",
     "Directional",
     "Point"
   };
 
   glm::vec3 rotToDir(const Project::Object &obj) {
-    return glm::normalize(obj.rot * glm::vec3{0,0,-1});
+    return glm::normalize(obj.rot.resolve() * glm::vec3{0,0,-1});
   }
 }
 
@@ -85,7 +85,7 @@ namespace Project::Component::Light
     Data &data = *static_cast<Data*>(entry.data.get());
     ctx.scene->addLight(Renderer::Light{
       .color = data.color,
-      .pos = glm::vec4{obj.pos, 0.0f},
+      .pos = glm::vec4{obj.pos.resolve(), 0.0f},
       .dir = rotToDir(obj),
       .type = data.type,
     });
@@ -115,16 +115,17 @@ namespace Project::Component::Light
 
     bool isSelected = ctx.selObjectUUID == obj.uuid;
 
+    auto pos = obj.pos.resolve();
     if(isSelected)
     {
-      Utils::Mesh::addLineBox(*vp.getLines(), obj.pos, {BOX_SIZE, BOX_SIZE, BOX_SIZE}, col);
+      Utils::Mesh::addLineBox(*vp.getLines(), pos, {BOX_SIZE, BOX_SIZE, BOX_SIZE}, col);
       if(data.type == LIGHT_TYPE_DIRECTIONAL)
       {
         glm::vec3 dir = rotToDir(obj);
-        Utils::Mesh::addLine(*vp.getLines(), obj.pos, obj.pos + (dir * -LINE_LEN), col);
+        Utils::Mesh::addLine(*vp.getLines(), pos, pos + (dir * -LINE_LEN), col);
       }
     }
 
-    Utils::Mesh::addSprite(*vp.getSprites(), obj.pos, obj.uuid, data.type, col);
+    Utils::Mesh::addSprite(*vp.getSprites(), pos, obj.uuid, data.type, col);
   }
 }

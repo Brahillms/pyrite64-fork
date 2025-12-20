@@ -28,7 +28,7 @@ void Editor::SceneInspector::draw() {
     ImGui::InpTable::addInputInt("Width", scene->conf.fbWidth);
     ImGui::InpTable::addInputInt("Height", scene->conf.fbHeight);
 
-    constexpr char* const FORMATS[] = {"RGBA16","RGBA32"};
+    constexpr const char* const FORMATS[] = {"RGBA16","RGBA32"};
     ImGui::InpTable::addComboBox("Format", scene->conf.fbFormat, FORMATS, 2);
 
     ImGui::InpTable::addColor("Color", scene->conf.clearColor, false);

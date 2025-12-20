@@ -25,9 +25,11 @@ namespace
     builder.set("enabled", obj.enabled);
     builder.set("isGroup", obj.isGroup);
 
-    builder.set("pos", obj.pos);
-    builder.set("rot", obj.rot);
-    builder.set("scale", obj.scale);
+    builder
+      .set(obj.uuidPrefab)
+      .set(obj.pos)
+      .set(obj.rot)
+      .set(obj.scale);
 
     std::vector<Builder> comps{};
     for (auto &comp : obj.components) {
@@ -89,9 +91,10 @@ void Project::Object::deserialize(Scene &scene, const simdjson::simdjson_result<
   enabled = Utils::JSON::readBool(doc, "enabled", true);
   isGroup = Utils::JSON::readBool(doc, "isGroup", false);
 
-  pos = Utils::JSON::readVec3(doc, "pos");
-  rot = Utils::JSON::readQuat(doc, "rot");
-  scale = Utils::JSON::readVec3(doc, "scale", {1,1,1});
+  Utils::JSON::readProp(doc, uuidPrefab);
+  Utils::JSON::readProp(doc, pos);
+  Utils::JSON::readProp(doc, rot);
+  Utils::JSON::readProp(doc, scale, {1,1,1});
 
   auto cmArray = doc["components"].get_array();
   if (cmArray.error() == simdjson::SUCCESS) {

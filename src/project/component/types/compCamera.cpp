@@ -26,7 +26,7 @@ namespace
   };*/
 
   glm::vec3 rotToDir(const Project::Object &obj) {
-    return glm::normalize(obj.rot * glm::vec3{0,0,-1});
+    return glm::normalize(obj.rot.value * glm::vec3{0,0,-1});
   }
 }
 
@@ -131,6 +131,6 @@ namespace Project::Component::Camera
       }
     }
 */
-    Utils::Mesh::addSprite(*vp.getSprites(), obj.pos, obj.uuid, 3, col);
+    Utils::Mesh::addSprite(*vp.getSprites(), obj.pos.resolve(), obj.uuid, 3, col);
   }
 }

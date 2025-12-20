@@ -45,9 +45,9 @@ void Editor::ObjectInspector::draw() {
 
   if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
     if (ImGui::InpTable::start("Transform")) {
-      ImGui::InpTable::addInputVec3("Pos", obj->pos);
-      ImGui::InpTable::addInputVec3("Scale", obj->scale);
-      ImGui::InpTable::addInputQuat("Rot", obj->rot);
+      ImGui::InpTable::addInputVec3("Pos", obj->pos.value);
+      ImGui::InpTable::addInputVec3("Scale", obj->scale.value);
+      ImGui::InpTable::addInputQuat("Rot", obj->rot.value);
 
       ImGui::InpTable::end();
     }
