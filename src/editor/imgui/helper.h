@@ -71,7 +71,7 @@ namespace ImGui
 
 namespace ImTable
 {
-  constinit inline static Project::Object *obj{nullptr};
+  extern Project::Object *obj;
 
   inline bool start(const char *name, Project::Object *nextObj = nullptr)
   {

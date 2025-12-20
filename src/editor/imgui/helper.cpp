@@ -9,6 +9,10 @@ namespace
   constexpr ImVec4 COLOR_NONE{0,0,0,0};
 }
 
+namespace ImTable {
+  constinit Project::Object* obj{nullptr};
+}
+
 bool ImGui::IconButton(const char* label, const ImVec2 &labelSize, const ImVec4 &color)
 {
   ImVec2 min = GetCursorScreenPos();
