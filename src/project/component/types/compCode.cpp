@@ -53,7 +53,7 @@ namespace Project::Component::Code
     return data;
   }
 
-  void build(Object&, Entry &entry, Build::SceneCtx &ctx)
+  void build(Object& obj, Entry &entry, Build::SceneCtx &ctx)
   {
     Data &data = *static_cast<Data*>(entry.data.get());
 
@@ -73,7 +73,7 @@ namespace Project::Component::Code
 
     for (auto &field : script->params.fields) {
       auto &prop = data.args[field.name];
-      auto val = prop.resolve();
+      auto val = prop.resolve(obj.propOverrides);
       if (val.empty())val = field.defaultValue;
       if (val.empty())val = "0";
 
@@ -102,7 +102,7 @@ namespace Project::Component::Code
     auto &scriptList = assets.getTypeEntries(AssetManager::FileType::CODE_OBJ);
 
     if (ImGui::InpTable::start("Comp")) {
-      ImGui::InpTable::addString("Name", entry.name);
+      ImGui::InpTable::add("Name", entry.name);
       ImGui::InpTable::add("Script");
       //ImGui::InputScalar("##UUID", ImGuiDataType_U64, &data.scriptUUID);
 
@@ -142,7 +142,7 @@ namespace Project::Component::Code
             ImGui::VectorComboBox("##arg" + std::to_string(idx), assets, uuid);
             data.args[field.name].value = std::to_string(uuid);
           } else {
-            ImGui::InpTable::addString(name, data.args[field.name].value);
+            ImGui::InpTable::add(name, data.args[field.name].value);
           }
           ++idx;
         }

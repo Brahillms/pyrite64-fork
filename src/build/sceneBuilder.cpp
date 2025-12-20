@@ -56,10 +56,10 @@ void Build::buildScene(Project::Project &project, const Project::SceneEntry &sce
     ctx.fileObj.write<uint16_t>(obj.id);
     ctx.fileObj.write<uint16_t>(obj.parent ? obj.parent->id : 0);
     ctx.fileObj.write<uint16_t>(0); // padding
-    ctx.fileObj.write(obj.pos.resolve());
-    ctx.fileObj.write(obj.scale.resolve());
+    ctx.fileObj.write(obj.pos.resolve(obj.propOverrides));
+    ctx.fileObj.write(obj.scale.resolve(obj.propOverrides));
 
-    auto &rot = obj.rot.resolve();
+    auto &rot = obj.rot.resolve(obj.propOverrides);
     uint32_t quatQuant = T3D::Quantizer::quatTo32Bit({rot.x, rot.y, rot.z, rot.w});
     ctx.fileObj.write(quatQuant);
 

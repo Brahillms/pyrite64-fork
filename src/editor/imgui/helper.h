@@ -7,7 +7,9 @@
 #include "imgui.h"
 #include "misc/cpp/imgui_stdlib.h"
 #include "IconsMaterialDesignIcons.h"
+#include "../../project/project.h"
 #include "../../utils/filePicker.h"
+#include "../../utils/prop.h"
 #include "glm/vec3.hpp"
 #include "glm/gtc/quaternion.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -69,9 +71,13 @@ namespace ImGui
 
 namespace ImGui::InpTable
 {
-  inline bool start(const char *name)
+  constinit inline static Project::Object *obj{nullptr};
+
+  inline bool start(const char *name, Project::Object *nextObj = nullptr)
   {
+    obj = nullptr;
     if (!ImGui::BeginTable(name, 2))return false;
+    obj = nextObj;
     ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed);
     ImGui::TableSetupColumn("Input", ImGuiTableColumnFlags_WidthStretch);
 
@@ -82,6 +88,7 @@ namespace ImGui::InpTable
   }
 
   inline void end() {
+    obj = nullptr;
     ImGui::EndTable();
   }
 
@@ -91,12 +98,6 @@ namespace ImGui::InpTable
     ImGui::AlignTextToFramePadding();
     ImGui::Text("%s", name.c_str());
     ImGui::TableSetColumnIndex(1);
-  }
-
-  inline void addString(const std::string &name, std::string &str) {
-    add(name);
-    auto labelHidden = "##" + name;
-    ImGui::InputText(labelHidden.c_str(), &str);
   }
 
   inline void addComboBox(const std::string &name, int &itemCurrent, const char* const items[], int itemsCount) {
@@ -117,28 +118,58 @@ namespace ImGui::InpTable
     ImGui::Checkbox(labelHidden.c_str(), &value);
   }
 
-  inline void addInputFloat(const std::string &name, float &value) {
-    add(name);
-    auto labelHidden = "##" + name;
-    ImGui::InputFloat(labelHidden.c_str(), &value);
+  template<typename T>
+  bool typedInput(T *value)
+  {
+    if constexpr (std::is_same_v<T, float>) {
+      return ImGui::InputFloat("##", value);
+    } else if constexpr (std::is_same_v<T, int>) {
+      return ImGui::InputInt("##", value);
+    } else if constexpr (std::is_same_v<T, glm::vec3>) {
+      return ImGui::InputFloat3("##", glm::value_ptr(*value));
+    } else if constexpr (std::is_same_v<T, glm::quat>) {
+      return ImGui::InputFloat4("##", glm::value_ptr(*value));
+    } else if constexpr (std::is_same_v<T, std::string>) {
+      return ImGui::InputText("##", value);
+    } else {
+      static_assert(false, "Unsupported type for typedInput");
+    }
+    return false;
   }
 
-  inline void addInputVec3(const std::string &name, glm::vec3 &v) {
+  template<typename T>
+  bool add(const std::string &name, T &value) {
     add(name);
-    auto labelHidden = "##" + name;
-    ImGui::InputFloat3(labelHidden.c_str(), &v.x);
+    PushID(name.c_str());
+    bool res = typedInput<T>(&value);
+    PopID();
+    return res;
   }
 
-  inline void addInputQuat(const std::string &name, glm::quat &v) {
-    add(name);
-    auto labelHidden = "##0" + name;
-    ImGui::InputFloat4(labelHidden.c_str(), &v.x);
-  }
+  template<typename T>
+  bool addProp(
+    const std::string &name,
+    Property<T> &prop
+  )
+  {
+    if(!obj)return false;
+    bool res{};
+    InpTable::add(name);
+    ImGui::PushID(&prop);
 
-  inline bool addInputInt(const std::string &name, int &value) {
-    add(name);
-    auto labelHidden = "##" + name;
-    return ImGui::InputInt(labelHidden.c_str(), &value);
+    bool isOverride{true};
+    T *val = &prop.value;
+    if(obj->uuidPrefab.value) {
+      val = &prop.resolve(obj->propOverrides, &isOverride);
+    }
+    if(!isOverride)ImGui::BeginDisabled();
+
+    res = typedInput<T>(val);
+
+    if(!isOverride)ImGui::EndDisabled();
+
+    ImGui::PopID();
+    return res;
   }
 
   inline void addColor(const std::string &name, glm::vec4 &color, bool withAlpha = true) {

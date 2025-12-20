@@ -14,8 +14,8 @@ bool Editor::ProjectSettings::draw()
 {
   if (ImGui::CollapsingHeader("General", ImGuiTreeNodeFlags_DefaultOpen)) {
     ImGui::InpTable::start("General");
-    ImGui::InpTable::addString("Name", ctx.project->conf.name);
-    ImGui::InpTable::addString("ROM-Name", ctx.project->conf.romName);
+    ImGui::InpTable::add("Name", ctx.project->conf.name);
+    ImGui::InpTable::add("ROM-Name", ctx.project->conf.romName);
     ImGui::InpTable::end();
   }
   if (ImGui::CollapsingHeader("Environment", ImGuiTreeNodeFlags_DefaultOpen)) {

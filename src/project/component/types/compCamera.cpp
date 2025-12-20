@@ -93,19 +93,19 @@ namespace Project::Component::Camera
       if(data.vpSize.x == 0) data.vpSize.x = scene->conf.fbWidth;
       if(data.vpSize.y == 0) data.vpSize.y = scene->conf.fbHeight;
 
-      ImGui::InpTable::addString("Name", entry.name);
+      ImGui::InpTable::add("Name", entry.name);
       ImGui::InpTable::add("Offset");
       ImGui::InputInt2("##vpOffset", &data.vpOffset.x);
       ImGui::InpTable::add("Size");
       ImGui::InputInt2("##vpSize", &data.vpSize.x);
 
       float fov = glm::degrees(data.fov);
-      ImGui::InpTable::addInputFloat("FOV", fov);
+      ImGui::InpTable::add("FOV", fov);
       data.fov = glm::radians(fov);
 
 
-      ImGui::InpTable::addInputFloat("Near", data.near);
-      ImGui::InpTable::addInputFloat("Far", data.far);
+      ImGui::InpTable::add("Near", data.near);
+      ImGui::InpTable::add("Far", data.far);
       //ImGui::InpTable::addComboBox("Type", data.type, LIGHT_TYPES, LIGHT_TYPE_COUNT);
       ImGui::InpTable::end();
     }
@@ -131,6 +131,6 @@ namespace Project::Component::Camera
       }
     }
 */
-    Utils::Mesh::addSprite(*vp.getSprites(), obj.pos.resolve(), obj.uuid, 3, col);
+    Utils::Mesh::addSprite(*vp.getSprites(), obj.pos.resolve(obj.propOverrides), obj.uuid, 3, col);
   }
 }

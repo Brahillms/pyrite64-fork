@@ -18,6 +18,9 @@ void Editor::ObjectInspector::draw() {
     return;
   }
 
+  bool isPrefabEdit = false;
+  bool isPrefabInst = false;
+
   auto scene = ctx.project->getScenes().getLoadedScene();
   if (!scene)return;
 
@@ -27,13 +30,22 @@ void Editor::ObjectInspector::draw() {
     return;
   }
 
+  Project::Object* srcObj = obj.get();
+  if(obj->uuidPrefab.value)
+  {
+    auto prefab = ctx.project->getAssets().getPrefabByUUID(obj->uuidPrefab.value);
+    if(prefab)srcObj = &prefab->obj;
+    isPrefabInst = true;
+  }
+
+
   //if (ImGui::CollapsingHeader("General", ImGuiTreeNodeFlags_DefaultOpen))
   {
     if (ImGui::InpTable::start("General")) {
-      ImGui::InpTable::addString("Name", obj->name);
+      ImGui::InpTable::add("Name", obj->name);
 
       int idProxy = obj->id;
-      ImGui::InpTable::addInputInt("ID", idProxy);
+      ImGui::InpTable::add("ID", idProxy);
       obj->id = static_cast<uint16_t>(idProxy);
 
       //ImGui::InpTable::add("UUID");
@@ -44,11 +56,10 @@ void Editor::ObjectInspector::draw() {
   }
 
   if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
-    if (ImGui::InpTable::start("Transform")) {
-      ImGui::InpTable::addInputVec3("Pos", obj->pos.value);
-      ImGui::InpTable::addInputVec3("Scale", obj->scale.value);
-      ImGui::InpTable::addInputQuat("Rot", obj->rot.value);
-
+    if (ImGui::InpTable::start("Transform", obj.get())) {
+      ImGui::InpTable::addProp("Pos", srcObj->pos);
+      ImGui::InpTable::addProp("Scale", srcObj->scale);
+      ImGui::InpTable::addProp("Rot", srcObj->rot);
       ImGui::InpTable::end();
     }
   }
@@ -65,25 +76,33 @@ void Editor::ObjectInspector::draw() {
     auto name = std::string{def.icon} + "  " + comp.name;
     if (ImGui::CollapsingHeader(name.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
     {
-      if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
-        ImGui::OpenPopup("CompCtx");
-      }
-
-      if(ImGui::BeginPopupContextItem("CompCtx"))
+      if(!isPrefabInst)
       {
-        if (ImGui::MenuItem(ICON_MDI_CONTENT_COPY " Duplicate")) {
-          compCopy = &comp;
+        if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
+          ImGui::OpenPopup("CompCtx");
         }
-        if (ImGui::MenuItem(ICON_MDI_TRASH_CAN_OUTLINE " Delete")) {
-          compDelUUID = comp.uuid;
+
+        if(ImGui::BeginPopupContextItem("CompCtx"))
+        {
+          if (ImGui::MenuItem(ICON_MDI_CONTENT_COPY " Duplicate")) {
+            compCopy = &comp;
+          }
+          if (ImGui::MenuItem(ICON_MDI_TRASH_CAN_OUTLINE " Delete")) {
+            compDelUUID = comp.uuid;
+          }
+          ImGui::EndPopup();
         }
-        ImGui::EndPopup();
       }
 
       def.funcDraw(*obj, comp);
     }
     ImGui::PopID();
   }
+
+  auto objStr = obj->serialize();
+  ImGui::TextWrapped("%s", objStr.c_str());
+
+  if(isPrefabInst)return;
 
   if (compCopy) {
     obj->addComponent(compCopy->id);
@@ -99,9 +118,6 @@ void Editor::ObjectInspector::draw() {
   if (ImGui::Button(addLabel)) {
     ImGui::OpenPopup("CompSelect");
   }
-
-  auto objStr = obj->serialize();
-  ImGui::TextWrapped(objStr.c_str());
 
   if (ImGui::BeginPopupContextItem("CompSelect"))
   {

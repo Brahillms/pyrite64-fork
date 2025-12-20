@@ -37,6 +37,8 @@ namespace Project
       bool selectable{true};
       bool isGroup{false};
 
+      std::unordered_map<uint64_t, GenericValue> propOverrides{};
+
       std::vector<std::shared_ptr<Object>> children{};
       std::vector<Component::Entry> components{};
 

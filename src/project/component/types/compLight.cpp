@@ -30,8 +30,8 @@ namespace
     "Point"
   };
 
-  glm::vec3 rotToDir(const Project::Object &obj) {
-    return glm::normalize(obj.rot.resolve() * glm::vec3{0,0,-1});
+  glm::vec3 rotToDir(Project::Object &obj) {
+    return glm::normalize(obj.rot.resolve(obj.propOverrides) * glm::vec3{0,0,-1});
   }
 }
 
@@ -85,7 +85,7 @@ namespace Project::Component::Light
     Data &data = *static_cast<Data*>(entry.data.get());
     ctx.scene->addLight(Renderer::Light{
       .color = data.color,
-      .pos = glm::vec4{obj.pos.resolve(), 0.0f},
+      .pos = glm::vec4{obj.pos.resolve(obj.propOverrides), 0.0f},
       .dir = rotToDir(obj),
       .type = data.type,
     });
@@ -96,9 +96,9 @@ namespace Project::Component::Light
 
     if (ImGui::InpTable::start("Comp"))
     {
-      ImGui::InpTable::addString("Name", entry.name);
+      ImGui::InpTable::add("Name", entry.name);
       ImGui::InpTable::addComboBox("Type", data.type, LIGHT_TYPES, LIGHT_TYPE_COUNT);
-      ImGui::InpTable::addInputInt("Index", data.index);
+      ImGui::InpTable::add("Index", data.index);
       ImGui::InpTable::addColor("Color", data.color, true);
 
       ImGui::InpTable::end();
@@ -115,7 +115,7 @@ namespace Project::Component::Light
 
     bool isSelected = ctx.selObjectUUID == obj.uuid;
 
-    auto pos = obj.pos.resolve();
+    auto pos = obj.pos.resolve(obj.propOverrides);
     if(isSelected)
     {
       Utils::Mesh::addLineBox(*vp.getLines(), pos, {BOX_SIZE, BOX_SIZE, BOX_SIZE}, col);

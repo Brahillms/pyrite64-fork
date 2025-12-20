@@ -47,13 +47,13 @@ void Editor::AssetInspector::draw() {
     }
     else if (asset->type == FileType::MODEL_3D)
     {
-      if (ImGui::InpTable::addInputInt("Base-Scale", asset->conf.baseScale)) {
+      if (ImGui::InpTable::add("Base-Scale", asset->conf.baseScale)) {
         ctx.project->getAssets().reloadAssetByUUID(asset->uuid);
       }
       ImGui::InpTable::addCheckBox("Create BVH", asset->conf.gltfBVH);
     } else if (asset->type == FileType::FONT)
     {
-      ImGui::InpTable::addInputInt("Size", asset->conf.baseScale);
+      ImGui::InpTable::add("Size", asset->conf.baseScale);
     }
 
     int idxCompr = static_cast<int>(asset->conf.compression);

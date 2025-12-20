@@ -99,7 +99,11 @@ namespace
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.f, 3.f));
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.f, 0.f));
 
-    auto nameID = obj.name + "##" + std::to_string(obj.uuid);
+    auto nameID = obj.name;
+    if(obj.uuidPrefab.value) {
+      nameID += " " ICON_MDI_PACKAGE_VARIANT_CLOSED;
+    }
+    nameID += "##" + std::to_string(obj.uuid);
 /*
     float iconAreaWidth = ImGui::GetStyle().WindowPadding.x + 2 * 12.0f + ImGui::GetStyle().ItemInnerSpacing.x;
     float available = ImGui::GetContentRegionAvail().x;

@@ -11,6 +11,52 @@
 #include "glm/vec4.hpp"
 #include "glm/gtc/quaternion.hpp"
 
+
+struct GenericValue
+{
+  std::string valString{};
+  union
+  {
+    glm::quat valQuat{};
+    glm::vec3 valVec3;
+    glm::vec4 valVec4;
+    uint64_t valU64;
+    uint32_t valU32;
+    int64_t valS64;
+    int32_t valS32;
+    float valFloat;
+    bool valBool;
+  };
+
+  template<typename T>
+  constexpr T& get()
+  {
+    if constexpr (std::is_same_v<T, glm::quat>) {
+      return valQuat;
+    } else if constexpr (std::is_same_v<T, glm::vec3>) {
+      return valVec3;
+    } else if constexpr (std::is_same_v<T, glm::vec4>) {
+      return valVec4;
+    } else if constexpr (std::is_same_v<T, uint64_t>) {
+      return valU64;
+    } else if constexpr (std::is_same_v<T, uint32_t>) {
+      return valU32;
+    } else if constexpr (std::is_same_v<T, int64_t>) {
+      return valS64;
+    } else if constexpr (std::is_same_v<T, int32_t>) {
+      return valS32;
+    } else if constexpr (std::is_same_v<T, float>) {
+      return valFloat;
+    } else if constexpr (std::is_same_v<T, bool>) {
+      return valBool;
+    } else if constexpr (std::is_same_v<T, std::string>) {
+      return valString;
+    } else  {
+      static_assert(false, "Unsupported type in GenericValue::get");
+    }
+  }
+};
+
 template<typename T>
 struct Property
 {
@@ -29,9 +75,14 @@ struct Property
     : name{std::move(propName)}, id{Utils::Hash::crc64(name)}, value{val}
   {}
 
-  const T& resolve() const
+  T& resolve(std::unordered_map<uint64_t, GenericValue> &overrides, bool *isOverride = nullptr)
   {
-    // @TODO: implement hierarchy lookup
+    auto it = overrides.find(id);
+    if(it != overrides.end()) {
+      if(isOverride)*isOverride = true;
+      return it->second.get<T>();
+    }
+    if(isOverride)*isOverride = false;
     return value;
   }
 };

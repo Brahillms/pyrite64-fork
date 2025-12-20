@@ -356,7 +356,7 @@ void Editor::Viewport3D::draw()
 
   //ImGui::Text("Viewport: %f | %f | %08X", mousePos.x, mousePos.y, ctx.selObjectUUID);
 
-  constexpr char* GIZMO_LABELS[3] = {ICON_MDI_CURSOR_MOVE, ICON_MDI_ROTATE_360, ICON_MDI_ARROW_EXPAND};
+  constexpr const char* const GIZMO_LABELS[3] = {ICON_MDI_CURSOR_MOVE, ICON_MDI_ROTATE_360, ICON_MDI_ARROW_EXPAND};
   for (int i=0; i<3; ++i) {
     if (ConnectedToggleButton(
       GIZMO_LABELS[i],

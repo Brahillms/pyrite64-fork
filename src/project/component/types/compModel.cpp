@@ -68,7 +68,7 @@ namespace Project::Component::Model
     auto &modelList = assets.getTypeEntries(AssetManager::FileType::MODEL_3D);
 
     if (ImGui::InpTable::start("Comp")) {
-      ImGui::InpTable::addString("Name", entry.name);
+      ImGui::InpTable::add("Name", entry.name);
       ImGui::InpTable::add("Model");
       //ImGui::InputScalar("##UUID", ImGuiDataType_U64, &data.scriptUUID);
 
@@ -120,15 +120,19 @@ namespace Project::Component::Model
     // @TODO: tidy-up
     glm::vec3 skew{0,0,0};
     glm::vec4 persp{0,0,0,1};
-    data.obj3D.uniform.modelMat = glm::recompose(obj.scale.resolve(), obj.rot.resolve(), obj.pos.resolve(), skew, persp);
+    data.obj3D.uniform.modelMat = glm::recompose(
+      obj.scale.resolve(obj.propOverrides),
+      obj.rot.resolve(obj.propOverrides),
+      obj.pos.resolve(obj.propOverrides),
+      skew, persp);
 
     data.obj3D.draw(pass, cmdBuff);
 
     bool isSelected = ctx.selObjectUUID == obj.uuid;
     if (isSelected)
     {
-      auto center = obj.pos.resolve() + (data.aabb.getCenter() * obj.scale.resolve() * (float)0xFFFF);
-      auto halfExt = data.aabb.getHalfExtend() * obj.scale.resolve() * (float)0xFFFF;
+      auto center = obj.pos.resolve(obj.propOverrides) + (data.aabb.getCenter() * obj.scale.resolve(obj.propOverrides) * (float)0xFFFF);
+      auto halfExt = data.aabb.getHalfExtend() * obj.scale.resolve(obj.propOverrides) * (float)0xFFFF;
 
       glm::u8vec4 aabbCol{0xAA,0xAA,0xAA,0xFF};
       if (isSelected) {

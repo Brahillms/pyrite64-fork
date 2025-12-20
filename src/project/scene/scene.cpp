@@ -84,14 +84,16 @@ std::shared_ptr<Project::Object> Project::Scene::addPrefabInstance(uint64_t pref
   auto prefab = ctx.project->getAssets().getPrefabByUUID(prefabUUID);
   if (!prefab)return nullptr;
 
-  prefab->obj.uuidPrefab.value = prefab->uuid.value;
-  prefab->obj.uuid = Utils::Hash::randomU32();
-  for(auto comp : prefab->obj.components) {
-    comp.uuid = Utils::Hash::randomU64();
-  }
+  auto obj = std::make_shared<Object>(root);
+  obj->id = nextUUID++;
+  obj->name += prefab->obj.name + " ("+std::to_string(obj->id)+")";
+  obj->uuid = Utils::Hash::randomU32();
+  obj->pos = prefab->obj.pos;
+  obj->rot = prefab->obj.rot;
+  obj->scale = prefab->obj.scale;
 
-  auto objJSON = prefab->obj.serialize();
-  return addObject(objJSON);
+  obj->uuidPrefab.value = prefab->uuid.value; // Link to prefab
+  return addObject(root, obj);
 }
 
 void Project::Scene::removeObject(Object &obj) {

@@ -45,11 +45,11 @@ namespace Project::Component::CollMesh
     return data;
   }
 
-  void build(Object&, Entry &entry, Build::SceneCtx &ctx)
+  void build(Object& obj, Entry &entry, Build::SceneCtx &ctx)
   {
     Data &data = *static_cast<Data*>(entry.data.get());
 
-    auto res = ctx.assetUUIDToIdx.find(data.modelUUID.resolve());
+    auto res = ctx.assetUUIDToIdx.find(data.modelUUID.resolve(obj.propOverrides));
     uint16_t id = 0xDEAD;
     if (res == ctx.assetUUIDToIdx.end()) {
       Utils::Logger::log("Component Model: Model UUID not found: " + std::to_string(entry.uuid), Utils::Logger::LEVEL_ERROR);
@@ -69,13 +69,13 @@ namespace Project::Component::CollMesh
     auto &modelList = assets.getTypeEntries(AssetManager::FileType::MODEL_3D);
 
     if (ImGui::InpTable::start("Comp")) {
-      ImGui::InpTable::addString("Name", entry.name);
+      ImGui::InpTable::add("Name", entry.name);
       ImGui::InpTable::add("Model");
       //ImGui::InputScalar("##UUID", ImGuiDataType_U64, &data.scriptUUID);
 
       int idx = modelList.size();
       for (int i=0; i<modelList.size(); ++i) {
-        if (modelList[i].uuid == data.modelUUID.resolve()) {
+        if (modelList[i].uuid == data.modelUUID.resolve(obj.propOverrides)) {
           idx = i;
           break;
         }
@@ -105,7 +105,7 @@ namespace Project::Component::CollMesh
   {
     Data &data = *static_cast<Data*>(entry.data.get());
     if (!data.obj3D.isMeshLoaded()) {
-      auto asset = ctx.project->getAssets().getEntryByUUID(data.modelUUID.resolve());
+      auto asset = ctx.project->getAssets().getEntryByUUID(data.modelUUID.resolve(obj.propOverrides));
       if (asset && asset->mesh3D) {
         if (!asset->mesh3D->isLoaded()) {
           asset->mesh3D->recreate(*ctx.scene);
@@ -121,7 +121,11 @@ namespace Project::Component::CollMesh
     // @TODO: tidy-up
     glm::vec3 skew{0,0,0};
     glm::vec4 persp{0,0,0,1};
-    data.obj3D.uniform.modelMat = glm::recompose(obj.scale.resolve(), obj.rot.resolve(), obj.pos.resolve(), skew, persp);
+    data.obj3D.uniform.modelMat = glm::recompose(
+      obj.scale.resolve(obj.propOverrides),
+      obj.rot.resolve(obj.propOverrides),
+      obj.pos.resolve(obj.propOverrides),
+      skew, persp);
     data.obj3D.uniform.mat.flags |= DRAW_SHADER_COLLISION;
 
     data.obj3D.draw(pass, cmdBuff);
@@ -129,8 +133,8 @@ namespace Project::Component::CollMesh
     bool isSelected = ctx.selObjectUUID == obj.uuid;
     if (isSelected)
     {
-      auto center = obj.pos.resolve() + (data.aabb.getCenter() * obj.scale.resolve() * (float)0xFFFF);
-      auto halfExt = data.aabb.getHalfExtend() * obj.scale.resolve() * (float)0xFFFF;
+      auto center = obj.pos.resolve(obj.propOverrides) + (data.aabb.getCenter() * obj.scale.resolve(obj.propOverrides) * (float)0xFFFF);
+      auto halfExt = data.aabb.getHalfExtend() * obj.scale.resolve(obj.propOverrides) * (float)0xFFFF;
 
       glm::u8vec4 aabbCol{0xAA,0xAA,0xAA,0xFF};
       if (isSelected) {

@@ -17,7 +17,7 @@ void Editor::SceneInspector::draw() {
 
   if (ImGui::CollapsingHeader("Settings", ImGuiTreeNodeFlags_DefaultOpen)) {
     ImGui::InpTable::start("Settings");
-    ImGui::InpTable::addString("Name", scene->conf.name);
+    ImGui::InpTable::add("Name", scene->conf.name);
 
     ImGui::InpTable::end();
   }
@@ -25,8 +25,8 @@ void Editor::SceneInspector::draw() {
   if (ImGui::CollapsingHeader("Framebuffer", ImGuiTreeNodeFlags_DefaultOpen)) {
     ImGui::InpTable::start("Framebuffer");
 
-    ImGui::InpTable::addInputInt("Width", scene->conf.fbWidth);
-    ImGui::InpTable::addInputInt("Height", scene->conf.fbHeight);
+    ImGui::InpTable::add("Width", scene->conf.fbWidth);
+    ImGui::InpTable::add("Height", scene->conf.fbHeight);
 
     constexpr const char* const FORMATS[] = {"RGBA16","RGBA32"};
     ImGui::InpTable::addComboBox("Format", scene->conf.fbFormat, FORMATS, 2);
