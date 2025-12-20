@@ -37,7 +37,8 @@ void Editor::AssetInspector::draw() {
   }
 
   ImGui::Text("File: %s", asset->name.c_str());
-  if (hasAssetConf && ImGui::CollapsingHeader("Settings", ImGuiTreeNodeFlags_DefaultOpen)) {
+  if (hasAssetConf && ImGui::CollapsingHeader("Settings", ImGuiTreeNodeFlags_DefaultOpen))
+  {
     ImGui::InpTable::start("Settings");
 
     if (asset->type == FileType::IMAGE)

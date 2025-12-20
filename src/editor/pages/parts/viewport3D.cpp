@@ -411,6 +411,19 @@ void Editor::Viewport3D::draw()
 
   ImGui::Image(ImTextureID(fb.getTexture()), {currSize.x, currSize.y});
 
+  if (ImGui::BeginDragDropTarget())
+  {
+    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET"))
+    {
+      uint64_t prefabUUID = *((uint64_t*)payload->Data);
+      auto prefab = ctx.project->getAssets().getPrefabByUUID(prefabUUID);
+      if(prefab) {
+        scene->addPrefabInstance(prefabUUID);
+      }
+    }
+    ImGui::EndDragDropTarget();
+  }
+
   isMouseHover = ImGui::IsItemHovered();
 
   ImDrawList* draw_list = ImGui::GetWindowDrawList();

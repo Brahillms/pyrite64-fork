@@ -79,6 +79,21 @@ std::shared_ptr<Project::Object> Project::Scene::addObject(Object&parent, std::s
   return obj;
 }
 
+std::shared_ptr<Project::Object> Project::Scene::addPrefabInstance(uint64_t prefabUUID)
+{
+  auto prefab = ctx.project->getAssets().getPrefabByUUID(prefabUUID);
+  if (!prefab)return nullptr;
+
+  prefab->obj.uuidPrefab.value = prefab->uuid.value;
+  prefab->obj.uuid = Utils::Hash::randomU32();
+  for(auto comp : prefab->obj.components) {
+    comp.uuid = Utils::Hash::randomU64();
+  }
+
+  auto objJSON = prefab->obj.serialize();
+  return addObject(objJSON);
+}
+
 void Project::Scene::removeObject(Object &obj) {
   if (ctx.selObjectUUID == obj.uuid) {
     ctx.selObjectUUID = 0;
@@ -147,6 +162,31 @@ bool Project::Scene::moveObject(uint32_t uuidObject, uint32_t uuidTarget, bool a
 void Project::Scene::save()
 {
   Utils::FS::saveTextFile(scenePath + "/scene.json", serialize());
+}
+
+uint32_t Project::Scene::createPrefabFromObject(uint32_t uuid)
+{
+  auto obj = getObjectByUUID(uuid);
+  if(!obj)return 0;
+
+  Prefab prefab{};
+  prefab.uuid.value = Utils::Hash::randomU64();
+  auto prefabJson = prefab.serialize(*obj);
+
+  std::string name = obj->name;
+
+  name.erase(std::remove_if(name.begin(), name.end(),
+    [](char c) { return !std::isalnum(c) && c != '_'; }
+  ), name.end());
+  if(name.empty())name = "prefab " + std::to_string(prefab.uuid.value);
+
+  Utils::FS::saveTextFile(
+    ctx.project->getPath() + "/assets/" + name + ".prefab",
+    prefabJson
+  );
+
+  ctx.project->getAssets().reload();
+  return 0;
 }
 
 std::string Project::Scene::serialize() {

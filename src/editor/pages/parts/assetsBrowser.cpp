@@ -52,7 +52,7 @@ void Editor::AssetsBrowser::draw() {
       .fileTypes = {FileType::CODE_OBJ, FileType::CODE_GLOBAL}
     },
     TabDef{
-      .name = ICON_MDI_CUBE_OUTLINE "  Prefabs",
+      .name = ICON_MDI_PACKAGE_VARIANT_CLOSED "  Prefabs",
       .fileTypes = {FileType::PREFAB}
     },
   };
@@ -122,6 +122,8 @@ void Editor::AssetsBrowser::draw() {
           iconTxt = ICON_MDI_MUSIC;
         } else if (asset.type == FileType::FONT) {
           iconTxt = ICON_MDI_FORMAT_FONT;
+        } else if (asset.type == FileType::PREFAB) {
+          iconTxt = ICON_MDI_PACKAGE_VARIANT_CLOSED;
         } else if (asset.type == FileType::CODE_OBJ || asset.type == FileType::CODE_GLOBAL) {
           iconTxt = ICON_MDI_LANGUAGE_CPP;
         }
@@ -153,7 +155,11 @@ void Editor::AssetsBrowser::draw() {
       }
 
       if (ImGui::BeginDragDropSource()) {
-        ImGui::ImageButton(asset.name.c_str(), icon, {imageSize*0.75f, imageSize*0.75f});
+        if(icon._TexID) {
+          ImGui::ImageButton(asset.name.c_str(), icon, {imageSize*0.75f, imageSize*0.75f});
+        } else {
+          ImGui::Button(iconTxt, textBtnSize);
+        }
         ImGui::SetDragDropPayload("ASSET", &asset.uuid, sizeof(asset.uuid));
         ImGui::EndDragDropSource();
       }

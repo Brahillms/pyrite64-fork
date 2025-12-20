@@ -49,7 +49,7 @@ namespace Project::Component::Light
     return data;
   }
 
-  std::string serialize(Entry &entry) {
+  std::string serialize(const Entry &entry) {
     Data &data = *static_cast<Data*>(entry.data.get());
     Utils::JSON::Builder builder{};
     builder.set("index", data.index);

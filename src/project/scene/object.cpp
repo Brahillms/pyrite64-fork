@@ -14,7 +14,7 @@ using Builder = Utils::JSON::Builder;
 
 namespace
 {
-  Builder serializeObj(Project::Object &obj)
+  Builder serializeObj(const Project::Object &obj)
   {
     Builder builder{};
     builder.set("id", obj.id);
@@ -34,7 +34,7 @@ namespace
     std::vector<Builder> comps{};
     for (auto &comp : obj.components) {
       auto &def = Project::Component::TABLE[comp.id];
-      comps.push_back({});
+      comps.emplace_back();
       Builder &builderCom = comps.back();
       builderCom.set("id", comp.id);
       builderCom.set("uuid", comp.uuid);
@@ -75,7 +75,7 @@ void Project::Object::removeComponent(uint64_t uuid) {
   );
 }
 
-std::string Project::Object::serialize() {
+std::string Project::Object::serialize() const {
   return serializeObj(*this).toString();
 }
 

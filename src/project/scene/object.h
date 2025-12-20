@@ -27,7 +27,7 @@ namespace Project
       uint32_t uuid{0};
       uint16_t id{};
 
-      PROP_U32(uuidPrefab);
+      PROP_U64(uuidPrefab);
 
       PROP_VEC3(pos);
       PROP_QUAT(rot);
@@ -46,7 +46,7 @@ namespace Project
       void addComponent(int compID);
       void removeComponent(uint64_t uuid);
 
-      std::string serialize();
+      std::string serialize() const;
       void deserialize(Scene *scene, const simdjson::simdjson_result<simdjson::dom::element> &doc);
   };
 }

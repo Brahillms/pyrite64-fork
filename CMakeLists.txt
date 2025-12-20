@@ -171,6 +171,7 @@ add_executable(p64editor src/main.cpp
         src/utils/prop.h
         src/project/scene/prefab.h
         src/project/scene/prefab.cpp
+        src/utils/hash.cpp
 )
 
 target_include_directories(p64editor PRIVATE

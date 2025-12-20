@@ -189,7 +189,12 @@ namespace
         }
 
         if (obj.parent) {
+          if (ImGui::MenuItem(ICON_MDI_PACKAGE_VARIANT_CLOSED_PLUS " To Prefab")) {
+            scene.createPrefabFromObject(obj.uuid);
+          }
+
           if(obj.isGroup)ImGui::Separator();
+
           if (ImGui::MenuItem(ICON_MDI_TRASH_CAN " Delete"))deleteObj = &obj;
         }
         ImGui::EndPopup();

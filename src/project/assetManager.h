@@ -131,6 +131,14 @@ namespace Project
         return &entries[it->second.first][it->second.second];
       }
 
+      std::shared_ptr<Prefab> getPrefabByUUID(uint64_t uuid) {
+        auto entry = getEntryByUUID(uuid);
+        if (!entry || entry->type != FileType::PREFAB) {
+          return nullptr;
+        }
+        return entry->prefab;
+      }
+
       const std::shared_ptr<Renderer::Texture> &getFallbackTexture();
 
       void save();

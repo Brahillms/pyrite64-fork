@@ -38,4 +38,11 @@ namespace Utils::Hash
     }
     return crc;
   }
+
+  uint64_t randomU64();
+
+  inline uint32_t randomU32() {
+    return randomU64() & 0xFFFFFFFF;
+  }
+
 }

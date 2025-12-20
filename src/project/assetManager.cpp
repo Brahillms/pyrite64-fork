@@ -71,10 +71,14 @@ void Project::AssetManager::reloadEntry(Entry &entry, const std::string &path)
   switch(entry.type)
   {
     case FileType::IMAGE:
-    {
       entry.texture = std::make_shared<Renderer::Texture>(ctx.gpu, path);
-      break;
-    }
+    break;
+
+    case FileType::PREFAB:
+    {
+      entry.prefab = std::make_shared<Prefab>();
+      entry.prefab->deserialize(Utils::FS::loadTextFile(path));
+    } break;
 
     case FileType::MODEL_3D:
     {
@@ -127,6 +131,8 @@ void Project::AssetManager::reload() {
       std::string outPath{};
       outPath = getAssetROMPath(path, projectBase);
 
+      uint64_t uuid = Utils::Hash::sha256_64bit("ASSET:" + path.string());
+
       FileType type = FileType::UNKNOWN;
       if (ext == ".png") {
         type = FileType::IMAGE;
@@ -140,12 +146,14 @@ void Project::AssetManager::reload() {
       } else if (ext == ".ttf") {
         type = FileType::FONT;
         outPath = changeExt(outPath, ".font64");
+      } else if (ext == ".prefab") {
+        type = FileType::PREFAB;
+        outPath = changeExt(outPath, ".pf");
       }
 
       auto romPath = outPath;
       romPath.replace(0, std::string{"filesystem/"}.length(), "rom:/");
 
-      uint64_t uuid = Utils::Hash::sha256_64bit("ASSET:" + path.string());
       Entry entry{
         .uuid = uuid,
         .name = path.filename().string(),
@@ -175,6 +183,11 @@ void Project::AssetManager::reload() {
 
       if (type == FileType::IMAGE && ctx.window) {
         reloadEntry(entry, path.string());
+      }
+
+      if (type == FileType::PREFAB) {
+        reloadEntry(entry, path.string());
+        entry.uuid = entry.prefab->uuid.value;
       }
 
       entries[(int)type].push_back(entry);

@@ -8,7 +8,6 @@
 #include <vector>
 
 #include "object.h"
-#include "simdjson.h"
 #include "../../utils/prop.h"
 #include "../component/components.h"
 #include "glm/vec3.hpp"
@@ -24,7 +23,9 @@ namespace Project
       PROP_U32(uuid);
       Object obj{};
 
-      std::string serialize();
-      void deserialize(const simdjson::simdjson_result<simdjson::dom::element> &doc);
+      std::string serialize(const Object &obj) const;
+      std::string serialize() const { return serialize(obj); }
+
+      void deserialize(const std::string &str);
   };
 }
