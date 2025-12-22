@@ -6,7 +6,7 @@
 #include <libdragon.h>
 
 extern "C" {
-  DEFINE_RSP_UCODE(rsp_fx);
+  DEFINE_RSP_UCODE(rsp_hdr);
 
   // Some libdragon issues with C++ and namespaces
   inline void rspq_write_1(uint32_t rspID, uint32_t cmd, uint32_t a) {
@@ -36,7 +36,7 @@ namespace {
 void RspHDR::init()
 {
   if(rspIdFX == 0) {
-    rspIdFX = rspq_overlay_register(&rsp_fx);
+    rspIdFX = rspq_overlay_register(&rsp_hdr);
   }
 }
 

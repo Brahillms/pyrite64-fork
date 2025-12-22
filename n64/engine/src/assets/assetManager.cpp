@@ -43,14 +43,6 @@ namespace
     AssetEntry entries[];
   };
 
-  void* load_t3dm(const char* path) {
-    auto model = t3d_model_load(path);
-    rspq_block_begin();
-      t3d_model_draw(model);
-    model->userBlock = rspq_block_end();
-    return model;
-  }
-
   struct AssetHandler
   {
     LoadFunc fnLoad{};
@@ -64,7 +56,7 @@ namespace
     [AssetType::IMAGE]    = {(LoadFunc)sprite_load,    (FreeFunc)sprite_free   },
     [AssetType::AUDIO]    = {nullptr,                  nullptr                 },
     [AssetType::FONT]     = {(LoadFunc)rdpq_font_load, (FreeFunc)rdpq_font_free},
-    [AssetType::MODEL_3D] = {(LoadFunc)load_t3dm,      (FreeFunc)t3d_model_free},
+    [AssetType::MODEL_3D] = {(LoadFunc)t3d_model_load, (FreeFunc)t3d_model_free},
     [AssetType::CODE]     = {nullptr,                  nullptr                 },
     [AssetType::PREFAB]   = {nullptr,                  nullptr                 },
   };

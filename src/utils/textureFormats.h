@@ -20,9 +20,10 @@ namespace Utils
     IHQ,
     SHQ,
     ZBUF,
+    BCI_256
   };
 
-  constexpr int TEX_TYPE_COUNT = static_cast<int>(TexFormat::ZBUF) + 1;
+  constexpr int TEX_TYPE_COUNT = static_cast<int>(TexFormat::BCI_256) + 1;
 
   constexpr const char* TEX_TYPES[] = {
     "Auto",
@@ -38,6 +39,7 @@ namespace Utils
     "IHQ",
     "SHQ",
     "ZBUF",
+    "BCI (256x)"
   };
 
   constexpr const char* getTexFormatName(TexFormat fmt) {

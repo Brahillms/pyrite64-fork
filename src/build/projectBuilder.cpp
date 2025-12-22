@@ -24,32 +24,14 @@ namespace
     auto entries = project.getAssets().getEntries();
     auto projectBase = fs::absolute(project.getPath()).string();
 
-    auto getComprLevel = [](Project::ComprTypes type) -> int {
-      int level = (int)type - 1;
-      if(level < 0) {
-        level = 1; // @TODO: add project default
-      }
-      return level;
-    };
-
     std::string rulePath{};
     for (const auto &typed : entries) {
       for (const auto &entry : typed)
       {
         if (entry.conf.exclude)continue;
-        auto comprLevel = std::to_string(getComprLevel(entry.conf.compression));
 
         switch(entry.type)
         {
-          case AT::IMAGE:
-            assetList.push_back(entry.outPath);
-            rules += assetList.back() + ": MKSPRITE_FLAGS = -c " + comprLevel;
-            if (entry.conf.format != 0) {
-              rules += std::string{" -f "} + Utils::TEX_TYPES[entry.conf.format];
-            }
-            rules += '\n';
-            break;
-
           case AT::MODEL_3D: // @TODO: remove here
           case AT::FONT:
             assetList.push_back(entry.outPath);
@@ -172,6 +154,13 @@ bool Build::buildProject(std::string path)
   success = buildFontAssets(project, sceneCtx);
   if(!success) {
     Utils::Logger::log("Font Asset build failed!", Utils::Logger::LEVEL_ERROR);
+    return false;
+  }
+
+  // Textures & BCI Textures (256x big-textures)
+  success = buildTextureAssets(project, sceneCtx);
+  if(!success) {
+    Utils::Logger::log("Texture Asset build failed!", Utils::Logger::LEVEL_ERROR);
     return false;
   }
 

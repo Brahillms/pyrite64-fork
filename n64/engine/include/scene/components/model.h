@@ -24,22 +24,7 @@ namespace P64::Comp
       return sizeof(Model);
     }
 
-    static void initDelete([[maybe_unused]] Object& obj, Model* data, uint16_t* initData)
-    {
-      if (initData == nullptr) {
-        data->~Model();
-        return;
-      }
-
-      uint16_t assetIdx = initData[0];
-      new(data) Model();
-
-      data->model = (T3DModel*)AssetManager::getByIndex(assetIdx);
-      assert(data->model != nullptr);
-
-      // auto scriptPtr = Script::getCodeByIndex(initData[0]);
-      // reserved: initData[1];
-    }
+    static void initDelete([[maybe_unused]] Object& obj, Model* data, uint16_t* initData);
 
     static void update(Object& obj, Model* data, float deltaTime) {
       auto mat = data->matFP.getNext();

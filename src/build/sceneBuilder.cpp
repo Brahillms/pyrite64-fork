@@ -29,7 +29,6 @@ namespace
 void Build::buildScene(Project::Project &project, const Project::SceneEntry &scene, SceneCtx &ctx)
 {
   std::string fileNameScene = "s" + Utils::padLeft(std::to_string(scene.id), '0', 4);
-  std::string fileNameStr = fileNameScene + "s";
   std::string fileNameObj = fileNameScene + "o";
 
   std::unique_ptr<Project::Scene> sc{new Project::Scene(scene.id, project.getPath())};
@@ -110,9 +109,6 @@ void Build::buildScene(Project::Project &project, const Project::SceneEntry &sce
   ctx.fileScene.align(4);
   ctx.fileScene.writeToFile(fsDataPath / fileNameScene);
 
-  Utils::FS::saveTextFile(fsDataPath / fileNameStr, "TODO");
-
   ctx.files.push_back("filesystem/p64/" + fileNameScene);
-  ctx.files.push_back("filesystem/p64/" + fileNameStr);
   ctx.files.push_back("filesystem/p64/" + fileNameObj);
 }

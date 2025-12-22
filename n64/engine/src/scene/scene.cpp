@@ -2,6 +2,8 @@
 * @copyright 2025 - Max Bebök
 * @license MIT
 */
+#include "scene/scene.h"
+
 #include <libdragon.h>
 #include <t3d/t3d.h>
 
@@ -14,8 +16,11 @@
 #include "assets/assetManager.h"
 #include "audio/audioManager.h"
 #include "../audio/audioManagerPrivate.h"
+
 #include "renderer/pipeline.h"
 #include "renderer/pipelineHDRBloom.h"
+#include "renderer/pipelineBigTex.h"
+
 #include "debug/debugDraw.h"
 #include "renderer/drawLayer.h"
 #include "scene/componentTable.h"
@@ -36,10 +41,10 @@ P64::Scene::Scene(uint16_t sceneId, Scene** ref)
 
   switch(conf.pipeline)
   {
-    case 0: renderPipeline = new RenderPipelineDefault(*this); break;
-    case 1: renderPipeline = new RenderPipelineHDRBloom(*this); break;
-
-    default: assertf(false, "Unknown render pipeline %d", conf.pipeline);
+    case SceneConf::Pipeline::DEFAULT    : renderPipeline = new RenderPipelineDefault(*this);  break;
+    case SceneConf::Pipeline::HDR_BLOOM  : renderPipeline = new RenderPipelineHDRBloom(*this); break;
+    case SceneConf::Pipeline::BIG_TEX_256: renderPipeline = new RenderPipelineBigTex(*this);   break;
+    default: assertf(false, "Unknown render pipeline %d", (int)conf.pipeline);
   }
 
 
@@ -60,9 +65,7 @@ P64::Scene::~Scene()
   rspq_wait();
 
   if (dplObjects)rspq_block_free(dplObjects);
-
   if(objStaticMats)free(objStaticMats);
-  free(stringTable);
 
   for(auto obj : objects) {
     obj->~Object();

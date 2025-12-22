@@ -173,6 +173,9 @@ add_executable(p64editor src/main.cpp
         src/project/scene/prefab.cpp
         src/utils/hash.cpp
         src/utils/prop.cpp
+        src/build/textureBuilder.cpp
+        src/build/tools/bci.cpp
+        src/build/tools/bci.h
 )
 
 target_include_directories(p64editor PRIVATE

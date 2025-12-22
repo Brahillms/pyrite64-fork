@@ -40,17 +40,10 @@ assets_conv ={{ASSET_LIST}}
 assets_conv += filesystem/p64/font.ia4.sprite
 
 # Images
-filesystem/%.sprite: assets/%.png
+filesystem/%.sprite: assets/p64/font.ia4.png
 	@mkdir -p $(dir $@)
 	@echo "    [SPRITE] $@"
 	$(N64_MKSPRITE) $(MKSPRITE_FLAGS) -o $(dir $@) "$<"
-
-# 3D-Models
-# filesystem/%.t3dm: assets/%.glb
-#	@mkdir -p $(dir $@)
-#	@echo "    [T3DM]"
-#	$(T3D_GLTF_TO_3D) "$<" $@ $(T3DM_FLAGS)
-#	$(N64_BINDIR)/mkasset $(T3DM_ASSET_FLAGS) -o $(dir $@) $@
 
 filesystem/p64/%: assets/p64/%
 	@mkdir -p $(dir $@)

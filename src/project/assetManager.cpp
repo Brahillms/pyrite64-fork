@@ -16,6 +16,7 @@
 #include "../utils/logger.h"
 #include "../utils/meshGen.h"
 #include "../utils/string.h"
+#include "../utils/textureFormats.h"
 #include "tiny3d/tools/gltf_importer/src/parser.h"
 
 namespace fs = std::filesystem;
@@ -181,8 +182,13 @@ void Project::AssetManager::reload() {
         }
       }
 
-      if (type == FileType::IMAGE && ctx.window) {
-        reloadEntry(entry, path.string());
+      if (type == FileType::IMAGE)
+      {
+        if(entry.path.ends_with(".bci.png")) {
+          entry.conf.format = (int)Utils::TexFormat::BCI_256;
+          outPath = changeExt(outPath, ".bci");
+        }
+        if(ctx.window)reloadEntry(entry, path.string());
       }
 
       if (type == FileType::PREFAB) {

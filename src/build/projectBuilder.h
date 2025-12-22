@@ -14,6 +14,7 @@ namespace Build
 
   bool buildT3DMAssets(Project::Project &project, SceneCtx &sceneCtx);
   bool buildFontAssets(Project::Project &project, SceneCtx &sceneCtx);
+  bool buildTextureAssets(Project::Project &project, SceneCtx &sceneCtx);
 
   bool buildProject(std::string path);
 }

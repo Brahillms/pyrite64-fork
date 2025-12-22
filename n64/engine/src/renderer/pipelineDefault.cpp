@@ -42,7 +42,7 @@ void P64::RenderPipelineDefault::init()
 
   VI::SwapChain::setDrawPass([this](surface_t *surf, uint32_t fbIndex, auto done) {
     rdpq_attach(surf, &Mem::allocDepthBuffer(state.screenSize[0], state.screenSize[1]));
-    scene.draw(1.0f / 60.0f);
+    scene.draw(VI::SwapChain::getDeltaTime());
     Debug::draw(static_cast<uint16_t*>(surf->buffer));
     rdpq_detach_cb((void(*)(void*))((void*)done), (void*)fbIndex);
   });

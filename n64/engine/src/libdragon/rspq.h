@@ -42,22 +42,10 @@ namespace LD::RSPQ
 
   volatile uint32_t *backupPointer;
   volatile uint32_t *backupSentinel;
-
-  uint64_t instrNextBuffOrg;
-  uint64_t instrNextBuffPatch;
   rdpq_tracking_t backupRdpTracking;
-
-  __attribute__ ((noinline))
-  inline void redirectNextBuffer()
-  {
-    assertf(false, "Can't resize redirected rspq buffeer!");
-  }
 
   inline void init()
   {
-    instrNextBuffPatch = 0x0800'0000 | (((uint32_t)redirectNextBuffer & 0xFFFFFF) >> 2);
-    instrNextBuffPatch <<= 32;
-    instrNextBuffOrg = *((uint64_t*)UncachedAddr(rspq_next_buffer));
   }
 
   inline void redirectStart(volatile uint32_t *newPointer, volatile uint32_t *newSentinel)
@@ -68,9 +56,6 @@ namespace LD::RSPQ
 
     rspq_cur_pointer = newPointer;
     rspq_cur_sentinel = newSentinel;
-
-    //*((uint64_t*)UncachedAddr(rspq_next_buffer)) = instrNextBuffPatch;
-    //asm ("cache 24, (%0)\n":: "r" (rspq_next_buffer));
   }
 
   inline volatile uint32_t* redirectEnd()
@@ -79,9 +64,6 @@ namespace LD::RSPQ
     rspq_cur_pointer = backupPointer;
     rspq_cur_sentinel = backupSentinel;
     rdpq_tracking = backupRdpTracking;
-
-    //*((uint64_t*)UncachedAddr(rspq_next_buffer)) = instrNextBuffOrg;
-    //asm ("cache 24, (%0)\n":: "r" (rspq_next_buffer));
 
     return end;
   }

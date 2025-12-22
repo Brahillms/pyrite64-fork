@@ -10,13 +10,32 @@
 #include "lighting.h"
 #include "object.h"
 #include "collision/scene.h"
+#include "renderer/pipeline.h"
 #include "scene/camera.h"
+
+namespace P64
+{
+  class RenderPipelineBigTex;
+}
+
+namespace P64
+{
+  class RenderPipelineHDRBloom;
+}
 
 namespace P64
 {
   class RenderPipeline;
 
   struct SceneConf {
+
+    enum class Pipeline : uint8_t
+    {
+      DEFAULT,
+      HDR_BLOOM,
+      BIG_TEX_256
+    };
+
     // clears depth/color or not
     constexpr static uint32_t FLAG_CLR_DEPTH = 1 << 0;
     constexpr static uint32_t FLAG_CLR_COLOR = 1 << 1;
@@ -29,7 +48,7 @@ namespace P64
     color_t clearColor{};
     uint32_t objectCount{};
 
-    uint8_t pipeline{};
+    Pipeline pipeline{};
     uint8_t padding[3];
   };
 
@@ -40,7 +59,6 @@ namespace P64
       Camera *camMain{nullptr};
 
       T3DMat4FP *objStaticMats{nullptr};
-      char* stringTable{nullptr};
       rspq_block_t *dplObjects{nullptr};
 
       RenderPipeline *renderPipeline{nullptr};
@@ -85,6 +103,28 @@ namespace P64
 
       void removeCamera(Camera *cam) {
         std::erase(cameras, cam);
+      }
+
+      /**
+       * Returns current (typed) rendering pipeline.
+       * If the expected type is not the correct one, returns nullptr.
+       * This function can be used to safely access pipeline-specific features.
+       *
+       * @tparam T Type of the expected rendering pipeline
+       * @return Pointer to the rendering pipeline of type T, or nullptr if the type does not match
+       */
+      template<typename T>
+      T* getRenderPipeline() {
+        if constexpr (std::is_same_v<T, RenderPipelineDefault>) {
+          if(conf.pipeline != SceneConf::Pipeline::DEFAULT)return nullptr;
+        }
+        if constexpr (std::is_same_v<T, RenderPipelineHDRBloom>) {
+          if(conf.pipeline != SceneConf::Pipeline::HDR_BLOOM)return nullptr;
+        }
+        if constexpr (std::is_same_v<T, RenderPipelineBigTex>) {
+          if(conf.pipeline != SceneConf::Pipeline::BIG_TEX_256)return nullptr;
+        }
+        return static_cast<T*>(renderPipeline);
       }
 
       void removeObject(Object &obj);

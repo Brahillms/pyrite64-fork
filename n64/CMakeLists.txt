@@ -64,5 +64,13 @@ add_executable(n64_engine
         engine/src/libdragon/utils.h
         engine/src/libdragon/utils.cpp
         engine/include/lib/mips.h
-        engine/src/renderer/hdr/postProcess.h
+        engine/src/renderer/pipelineBigTex.cpp
+        engine/src/scene/components/model.cpp
+        engine/src/renderer/bigtex/bigtex.h
+        engine/src/renderer/bigtex/bigtex.cpp
+        engine/src/renderer/bigtex/textures.cpp
+        engine/src/renderer/bigtex/uvTexture.cpp
+        engine/src/renderer/bigtex/memory.cpp
+        engine/src/renderer/bigtex/fbCpuDraw.cpp
+        engine/src/renderer/bigtex/rspBigTex.cpp
 )

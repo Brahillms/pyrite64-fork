@@ -63,8 +63,6 @@ void P64::Scene::loadScene() {
 
   cameras.clear();
 
-  stringTable = (char*)loadSubFile('s');
-
   //debugf("Objects: %lu\n", conf.objectCount);
   if(conf.objectCount)
   {
