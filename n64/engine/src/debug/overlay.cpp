@@ -26,7 +26,9 @@ namespace {
   constexpr color_t COLOR_BVH{ 0x00, 0xAA, 0x22, 0xFF};
   constexpr color_t COLOR_COLL{0x22,0xFF,0x00, 0xFF};
   constexpr color_t COLOR_ACTOR_UPDATE{0xAA,0,0, 0xFF};
+  constexpr color_t COLOR_GLOBAL_UPDATE{0x33,0x33,0x33, 0xFF};
   constexpr color_t COLOR_SCENE_DRAW{0xFF,0x80,0x10, 0xFF};
+  constexpr color_t COLOR_GLOBAL_DRAW{0x33,0x33,0x33, 0xFF};
   constexpr color_t COLOR_AUDIO{0x43, 0x52, 0xFF, 0xFF};
 
   enum class MenuItemType : uint8_t {
@@ -113,7 +115,7 @@ void Debug::Overlay::draw(P64::Scene &scene, surface_t* surf)
   if(!isVisible)
   {
     Debug::printStart();
-    Debug::printf(260, 24, "%.2f\n", (double)P64::VI::SwapChain::getFPS());
+    Debug::printf(20, 16, "%.2f\n", (double)P64::VI::SwapChain::getFPS());
     return;
   }
 
@@ -211,9 +213,13 @@ void Debug::Overlay::draw(P64::Scene &scene, surface_t* surf)
   posX = Debug::printf(posX, posY, "%.2f", (double)TICKS_TO_US(collScene.ticks - collScene.ticksBVH) / 1000.0) + 8;
   //posX = Debug::printf(posX, posY, "Ray:%d", collScene.raycastCount) + 8;
   rdpq_set_prim_color(COLOR_ACTOR_UPDATE);
-  posX = Debug::printf(posX, posY, "%.2f", (double)TICKS_TO_US(scene.ticksActorUpdate) / 1000.0) + 8;
+  Debug::printf(posX, posY, "%.2f", (double)TICKS_TO_US(scene.ticksActorUpdate) / 1000.0);
+    rdpq_set_prim_color(COLOR_GLOBAL_UPDATE);
+    posX = Debug::printf(posX, posY + 8, "%.2f", (double)TICKS_TO_US(scene.ticksGlobalUpdate) / 1000.0) + 8;
   rdpq_set_prim_color(COLOR_SCENE_DRAW);
-  posX = Debug::printf(posX, posY, "%.2f", (double)TICKS_TO_US(scene.ticksDraw) / 1000.0) + 8;
+  Debug::printf(posX, posY, "%.2f", (double)TICKS_TO_US(scene.ticksDraw - scene.ticksGlobalDraw) / 1000.0);
+    rdpq_set_prim_color(COLOR_GLOBAL_DRAW);
+    posX = Debug::printf(posX, posY+8, "%.2f", (double)TICKS_TO_US(scene.ticksGlobalDraw) / 1000.0)+ 8;
   rdpq_set_prim_color(COLOR_AUDIO);
   posX = Debug::printf(posX, posY, "%.2f", (double)TICKS_TO_US(P64::AudioManager::ticksUpdate) / 1000.0) + 8;
 
@@ -290,7 +296,9 @@ void Debug::Overlay::draw(P64::Scene &scene, surface_t* surf)
   float timeCollBVH = usToWidth(TICKS_TO_US(collScene.ticksBVH));
   float timeColl = usToWidth(TICKS_TO_US(collScene.ticks - collScene.ticksBVH));
   float timeActorUpdate = usToWidth(TICKS_TO_US(scene.ticksActorUpdate));
-  float timeSceneDraw = usToWidth(TICKS_TO_US(scene.ticksDraw));
+  float timeGlobalUpdate = usToWidth(TICKS_TO_US(scene.ticksGlobalUpdate));
+  float timeSceneDraw = usToWidth(TICKS_TO_US(scene.ticksDraw - scene.ticksGlobalDraw));
+  float timeGlobalDraw = usToWidth(TICKS_TO_US(scene.ticksGlobalDraw));
   float timeAudio = usToWidth(TICKS_TO_US(P64::AudioManager::ticksUpdate));
   float timeSelf = usToWidth(TICKS_TO_US(ticksSelf));
 
@@ -305,8 +313,12 @@ void Debug::Overlay::draw(P64::Scene &scene, surface_t* surf)
   rdpq_fill_rectangle(posX, posY, posX + timeColl, posY + barHeight); posX += timeColl;
   rdpq_set_fill_color(COLOR_ACTOR_UPDATE);
   rdpq_fill_rectangle(posX, posY, posX + timeActorUpdate, posY + barHeight); posX += timeActorUpdate;
+  rdpq_set_fill_color(COLOR_GLOBAL_UPDATE);
+  rdpq_fill_rectangle(posX, posY, posX + timeGlobalUpdate, posY + barHeight); posX += timeGlobalUpdate;
   rdpq_set_fill_color(COLOR_SCENE_DRAW);
   rdpq_fill_rectangle(posX, posY, posX + timeSceneDraw, posY + barHeight); posX += timeSceneDraw;
+  rdpq_set_fill_color(COLOR_GLOBAL_DRAW);
+  rdpq_fill_rectangle(posX, posY, posX + timeGlobalDraw, posY + barHeight); posX += timeGlobalDraw;
   rdpq_set_fill_color(COLOR_AUDIO);
   rdpq_fill_rectangle(posX, posY, posX + timeAudio, posY + barHeight); posX += timeAudio;
   rdpq_set_fill_color({0xFF,0xFF,0xFF, 0xFF});

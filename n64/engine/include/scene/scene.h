@@ -99,6 +99,8 @@ namespace P64
 
     public:
       uint64_t ticksActorUpdate{0};
+      uint64_t ticksGlobalUpdate{0};
+      uint64_t ticksGlobalDraw{0};
       uint64_t ticksDraw{0};
 
       explicit Scene(uint16_t sceneId, Scene** ref);

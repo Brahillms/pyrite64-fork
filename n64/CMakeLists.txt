@@ -88,4 +88,5 @@ add_executable(n64_engine
         engine/src/debug/overlay.cpp
         engine/include/collision/attach.h
         engine/src/collision/attach.cpp
+        engine/include/lib/string.h
 )

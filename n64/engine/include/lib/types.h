@@ -11,36 +11,56 @@ namespace P64
   constexpr T* unached(T *ptr) {
     return (T*)UncachedAddr(ptr);
   }
-}
 
-consteval uint32_t operator"" _u32(const char *str, size_t len) {
-  uint32_t result = 0;
-  for (size_t i = 0; i < len; i++) {
-    result |= ((uint32_t)str[i] << (8 * (3-i)));
+  consteval uint32_t crc32(const char* str, size_t len) {
+    uint32_t crc = 0xFFFFFFFF;
+    for (size_t i = 0; i < len; i++) {
+      crc ^= static_cast<uint8_t>(str[i]);
+      for (int j = 0; j < 8; j++) {
+        if (crc & 1) {
+          crc = (crc >> 1) ^ 0xEDB88320;
+        } else {
+          crc >>= 1;
+        }
+      }
+    }
+    return ~crc;
   }
-  return result;
-}
 
-static_assert("abcd"_u32 == 0x61626364);
-static_assert("abc"_u32  == 0x61626300);
-
-consteval uint64_t operator"" _u64(const char *str, size_t len) {
-  uint64_t result = 0;
-  for (size_t i = 0; i < len; i++) {
-    result |= ((uint64_t)str[i] << (8 * (7-i)));
+  consteval uint64_t crc64(const char* str, size_t len)
+  {
+    uint64_t crc = 0xFFFFFFFFFFFFFFFF;
+    for (size_t i = 0; i < len; i++) {
+      crc ^= static_cast<uint8_t>(str[i]);
+      for (int j = 0; j < 8; j++) {
+        if (crc & 1) {
+          crc = (crc >> 1) ^ 0xC96C5795D7870F42;
+        } else {
+          crc >>= 1;
+        }
+      }
+    }
+    return crc;
   }
-  return result;
 }
 
-static_assert("abcd0123"_u64 == 0x61626364'30313233);
-static_assert("abcd012"_u64 == 0x61626364'30313200);
-static_assert("abc"_u64  == 0x61626300'00000000);
+consteval uint32_t operator ""_crc32(const char *str, size_t len)
+{
+  return P64::crc32(str, len);
+}
 
-consteval float operator ""    _s(long double x) { return static_cast<float>(x); }
-consteval float operator ""   _ms(long double x) { return static_cast<float>(x / 1000.0); }
+static_assert("abcd"_crc32 == 0xed82cd11);
+static_assert("someVeryLongValueToHash1234"_crc32  == 0xf92e9c5f);
 
-consteval float operator ""    _s(unsigned long long x) { return static_cast<float>(x); }
-consteval float operator ""   _ms(unsigned long long x) { return static_cast<float>(x) / 1000.0f; }
+consteval uint64_t operator ""_crc64(const char *str, size_t len) {
+  return P64::crc64(str, len);
+}
+
+static_assert("abcd0123"_crc64 == 10979894622067171079llu);
+static_assert("abcd012"_crc64 == 4087111044808462530llu);
+
+consteval float operator ""_s(long double x) { return static_cast<float>(x); }
+consteval float operator ""_ms(long double x) { return static_cast<float>(x / 1000.0); }
 
 #define CLASS_NO_COPY_MOVE(cls) \
   cls(const cls&) = delete; \

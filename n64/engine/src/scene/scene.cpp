@@ -89,6 +89,7 @@ void P64::Scene::update(float deltaTime)
   // reset metrics
   ticksActorUpdate = 0;
   ticksDraw = 0;
+  ticksGlobalDraw = 0;
   collScene.ticks = 0;
   collScene.ticksBVH = 0;
   collScene.raycastCount = 0;
@@ -113,7 +114,9 @@ void P64::Scene::update(float deltaTime)
   }
   objectsToAdd.clear();
 
+  ticksGlobalUpdate = get_user_ticks();
   GlobalScript::callHooks(GlobalScript::HookType::SCENE_UPDATE);
+  ticksGlobalUpdate = get_user_ticks() - ticksGlobalUpdate;
 
   ticksActorUpdate = get_ticks();
   for(auto obj : objects)
@@ -213,7 +216,9 @@ void P64::Scene::draw([[maybe_unused]] float deltaTime)
       }
     }
 
+    auto t = get_user_ticks();
     GlobalScript::callHooks(GlobalScript::HookType::SCENE_POST_DRAW_3D);
+    ticksGlobalDraw += get_user_ticks() - t;
 
     t3d_matrix_pop(1);
     for(int i=1; i<conf.layerSetup.layerCount3D; ++i) {
@@ -223,9 +228,11 @@ void P64::Scene::draw([[maybe_unused]] float deltaTime)
     }
   }
 
+  auto t = get_user_ticks();
   DrawLayer::use(conf.layerSetup.layerCount3D + conf.layerSetup.layerCountPtx);
     GlobalScript::callHooks(GlobalScript::HookType::SCENE_DRAW_2D);
   DrawLayer::useDefault();
+  ticksGlobalDraw += get_user_ticks() - t;
 
   renderPipeline->draw();
   ticksDraw = get_ticks() - ticksDraw;
