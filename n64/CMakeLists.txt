@@ -90,4 +90,5 @@ add_executable(n64_engine
         engine/src/collision/attach.cpp
         engine/src/scene/componentTable.cpp
         engine/src/collision/scene.cpp
+        engine/src/scene/components/culling.cpp
 )

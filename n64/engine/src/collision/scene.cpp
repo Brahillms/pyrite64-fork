@@ -14,7 +14,7 @@
 namespace
 {
   constexpr float MIN_PENETRATION = 0.00004f;
-  constexpr float FLOOR_ANGLE = 0.7f;
+  constexpr float FLOOR_ANGLE = 0.4f;
 
   constexpr bool isFloor(const P64::Coll::IVec3 &normal) {
     return normal.v[1] > (int16_t)(0x7FFF * FLOOR_ANGLE);
@@ -262,7 +262,7 @@ P64::Coll::RaycastRes P64::Coll::Scene::raycastFloor(const fm_vec3_t &pos) {
       if(collInfo.hasResult() && collInfo.hitPos.v[1] > highestFloor)
       {
         res.hitPos = meshInst->outOfLocalSpace(collInfo.hitPos);
-        res.normal = collInfo.normal;
+        res.normal = meshInst->object->rot * collInfo.normal;
         highestFloor = collInfo.hitPos.v[1];
       }
     }

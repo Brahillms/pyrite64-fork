@@ -50,6 +50,8 @@ namespace {
 
   constinit Menu menu{};
   constinit Menu menuScenes{};
+
+  constinit T3DMetrics *metrics = nullptr;
   
   uint64_t ticksSelf = 0;
 
@@ -112,10 +114,14 @@ void Debug::Overlay::init()
 
 void Debug::Overlay::draw(P64::Scene &scene, surface_t* surf)
 {
+  if(!metrics)metrics = (T3DMetrics*)malloc_uncached(sizeof(T3DMetrics));
+  t3d_metrics_fetch(metrics); // @TODO: remove
+
   if(!isVisible)
   {
     Debug::printStart();
     Debug::printf(20, 16, "%.2f\n", (double)P64::VI::SwapChain::getFPS());
+    Debug::printf(20, 16+8, "%d / %d\n", metrics->trisPostCull, metrics->trisPreCull);
     return;
   }
 

@@ -16,6 +16,8 @@ void P64::Camera::update([[maybe_unused]] float deltaTime)
 
   t3d_viewport_look_at(viewports, pos, target, up);
 
+  //t3d_mat4_to_frustum(viewports.viewFrustum, viewports.matCamProj);
+
 /*  fm_vec3_t up{{0, 1, 0}};
   t3d_mat4_look_at(vp.matCamera, pos, target, up);
 

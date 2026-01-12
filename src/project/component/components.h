@@ -41,6 +41,7 @@ namespace Project::Component
   struct CompInfo
   {
     int id{};
+    int prio{};
     const char* icon{};
     const char* name{};
     FuncCompInit funcInit{};
@@ -73,6 +74,7 @@ namespace Project::Component
   MAKE_COMP(CollBody)
   MAKE_COMP(Audio2D)
   MAKE_COMP(Constraint)
+  MAKE_COMP(Culling)
 
   constexpr std::array TABLE{
     CompInfo{
@@ -163,6 +165,18 @@ namespace Project::Component
       .funcSerialize = Constraint::serialize,
       .funcDeserialize = Constraint::deserialize,
       .funcBuild = Constraint::build
+    },
+    CompInfo{
+      .id = 8,
+      .prio = -1, // culling must come before any models
+      .icon = ICON_MDI_EYE_OFF_OUTLINE " ",
+      .name = "Culling",
+      .funcInit = Culling::init,
+      .funcDraw = Culling::draw,
+      .funcDrawPost3D = Culling::draw3D,
+      .funcSerialize = Culling::serialize,
+      .funcDeserialize = Culling::deserialize,
+      .funcBuild = Culling::build
     },
   };
 }

@@ -206,7 +206,9 @@ void P64::Scene::draw([[maybe_unused]] float deltaTime)
       if(!obj->isEnabled())continue;
       auto compRefs = obj->getCompRefs();
 
-      for (uint32_t i=0; i<obj->compCount; ++i) {
+      for (uint32_t i=0; i<obj->compCount; ++i)
+      {
+        if(obj->flags & ObjectFlags::IS_CULLED)break;
         const auto &compDef = COMP_TABLE[compRefs[i].type];
         if(compDef.draw)
         {
@@ -214,6 +216,10 @@ void P64::Scene::draw([[maybe_unused]] float deltaTime)
           compDef.draw(*obj, dataPtr, deltaTime);
         }
       }
+
+      // culling resets directly after a draw, otherwise objects can get stuck culled.
+      // this is also needed to handle multiple cameras correctly.
+      obj->setFlag(ObjectFlags::IS_CULLED, false);
     }
 
     auto t = get_user_ticks();

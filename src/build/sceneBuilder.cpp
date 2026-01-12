@@ -74,14 +74,35 @@ void Build::writeObject(Build::SceneCtx &ctx, Project::Object &obj, bool savePre
     //ctx.fileObj.write<uint16_t>(comp.id);
   };
 
+
+  std::vector<Project::Component::Entry*> compList{};
   for (auto &comp : srcObj->components) {
-    saveComp(comp);
+    compList.push_back(&comp);
   }
 
   if(srcObj != &obj) {
     for (auto &comp : obj.components) {
-      saveComp(comp);
+      compList.push_back(&comp);
     }
+  }
+
+  // sort by component prio
+  std::sort(compList.begin(), compList.end(),
+    [](const Project::Component::Entry* a, const Project::Component::Entry* b) {
+      int prioA = 0;
+      int prioB = 0;
+      if (a->id >= 0 && a->id < Project::Component::TABLE.size()) {
+        prioA = Project::Component::TABLE[a->id].prio;
+      }
+      if (b->id >= 0 && b->id < Project::Component::TABLE.size()) {
+        prioB = Project::Component::TABLE[b->id].prio;
+      }
+      return prioA < prioB;
+    }
+  );
+
+  for(auto &comp : compList) {
+    saveComp(*comp);
   }
 
   ctx.fileObj.write<uint32_t>(0);
