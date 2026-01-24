@@ -65,6 +65,8 @@ static_assert("abcd012"_crc64 == 4087111044808462530llu);
 
 consteval float operator ""_s(long double x) { return static_cast<float>(x); }
 consteval float operator ""_ms(long double x) { return static_cast<float>(x / 1000.0); }
+consteval float operator ""_deg(long double x) { return static_cast<float>(x * 3.14159265358979323846 / 180.0); }
+consteval float operator ""_rad(long double x) { return static_cast<float>(x); }
 
 #define CLASS_NO_COPY_MOVE(cls) \
   cls(const cls&) = delete; \
