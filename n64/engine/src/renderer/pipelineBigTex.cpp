@@ -37,6 +37,14 @@ void P64::RenderPipelineBigTex::init()
   BigTex::ucodeInit();
   fbs = BigTex::allocBuffers();
 
+  // clear buffers to avoid garbage on the first 2 frames (since it's out of phase)
+  for(auto &fb : fbs.color) {
+    sys_hw_memset(fb.buffer, 0, fb.height * fb.stride);
+  }
+  for(auto &fb : fbs.uv) {
+    sys_hw_memset(fb.buffer, 0, fb.height * fb.stride);
+  }
+
   /*
   heap_stats_t h;
   sys_get_heap_stats(&h);

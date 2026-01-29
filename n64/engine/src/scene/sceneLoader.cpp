@@ -38,6 +38,13 @@ namespace {
   // the path is stored here and changed by each load
   char scenePath[] = "rom:/p64/s0000_";
 
+  inline void updateScenePath(uint16_t id)
+  {
+    scenePath[sizeof(scenePath)-5] = '0' + ((id/100) % 10);
+    scenePath[sizeof(scenePath)-4] = '0' + ((id/10) % 10);
+    scenePath[sizeof(scenePath)-3] = '0' + (id % 10);
+  }
+
   inline void* loadSubFile(char type) {
     scenePath[sizeof(scenePath)-2] = type;
     scenePath[sizeof(scenePath)-1] = '\0';
@@ -47,7 +54,7 @@ namespace {
 
 void P64::Scene::loadSceneConfig()
 {
-  scenePath[sizeof(scenePath)-3] = '0' + id;
+  updateScenePath(id);
   scenePath[sizeof(scenePath)-2] = '\0';
 
   {
@@ -99,6 +106,11 @@ P64::Object* P64::Scene::loadObject(uint8_t* &objFile, std::function<void(Object
   //debugf("Allocating object %d | comps: %d | size: %lu bytes\n", objEntry->id, compCount, allocSize);
 
   void* objMem = memalign(DATA_ALIGN, allocSize); // @TODO: custom allocator
+  if(allocSize < 16) {
+    memset(objMem, 0, allocSize);
+  } else {
+    sys_hw_memset(objMem, 0, allocSize);
+  }
 
   auto objCompTablePtr = (Object::CompRef*)((char*)objMem + sizeof(Object));
   auto objCompDataPtr = (char*)(objCompTablePtr) + offsetData;
@@ -148,7 +160,7 @@ P64::Object* P64::Scene::loadObject(uint8_t* &objFile, std::function<void(Object
 }
 
 void P64::Scene::loadScene() {
-  scenePath[sizeof(scenePath)-3] = '0' + id;
+  updateScenePath(id);
   scenePath[sizeof(scenePath)-2] = '\0';
 
   cameras.clear();

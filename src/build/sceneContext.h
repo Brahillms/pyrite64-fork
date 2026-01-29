@@ -17,6 +17,7 @@ namespace Build
     std::string path{};
     uint32_t stringOffset{};
     uint32_t type{};
+    uint32_t flags{};
   };
 
   struct SceneCtx

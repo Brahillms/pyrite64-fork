@@ -47,7 +47,7 @@ Editor::NodeEditor::NodeEditor(uint64_t assetUUID)
   //name = "Node-Editor - ";
   name = currentAsset ? currentAsset->name : "*New Graph*";
 
-  graph.graph.droppedLinkPopUpContent([&](ImFlow::Pin* dragged)
+  auto createPopup = [](Project::Graph::Graph &graph, ImFlow::Pin* pin)
   {
     ImGui::Text("Create New");
     ImGui::Separator();
@@ -55,29 +55,33 @@ Editor::NodeEditor::NodeEditor(uint64_t assetUUID)
     for(size_t i = 0; i < names.size(); ++i) {
       if(ImGui::Selectable(names[i].c_str())) {
 
-        auto newPos = dragged->getParent()->getPos();
+        auto newPos = pin ? pin->getParent()->getPos() : ImVec2{0,0};
         newPos.x += 150;
         auto node = graph.addNode(static_cast<uint32_t>(i), newPos);
 
         auto &ins = node->getIns();
-        if(!ins.empty())ins[0]->createLink(dragged);
+        if(pin && !ins.empty())ins[0]->createLink(pin);
 
         node->setPos(newPos);
         ImGui::CloseCurrentPopup();
       }
     }
+  };
+
+  graph.graph.droppedLinkPopUpContent([&](ImFlow::Pin* pin)
+  {
+    createPopup(graph, pin);
   });
 
   graph.graph.rightClickPopUpContent([&](ImFlow::BaseNode* node)
   {
-
     if(node) {
       if(ImGui::Selectable(ICON_MDI_TRASH_CAN_OUTLINE " Remove")) {
         node->destroy();
         ImGui::CloseCurrentPopup();
       }
     } else {
-      ImGui::Text("@TODO: Create new node");
+      createPopup(graph, nullptr);
     }
   });
 

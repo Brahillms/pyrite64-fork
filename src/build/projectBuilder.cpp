@@ -40,7 +40,12 @@ void Build::SceneCtx::addAsset(const Project::AssetManagerEntry &entry)
     assetFileMap += "if(path == \"" + outNameNoPrefix + "\")return " + std::to_string(assetList.size()) + ";\n";
   }
 
-  assetList.push_back({entry.romPath, stringOffset, ((uint32_t)entry.type) << 24});
+  uint32_t flags = 0;
+  if(entry.type == AT::FONT) {
+    flags |= 0x01; // KEEP_LOADED
+  }
+
+  assetList.push_back({entry.romPath, stringOffset, (uint32_t)entry.type, flags});
   stringOffset += entry.romPath.size() + 1;
 }
 
@@ -70,7 +75,6 @@ bool Build::buildProject(const std::string &path)
   sceneCtx.files.push_back("filesystem/p64/conf");
 
   // Asset-Manager
-
   for (auto &typed : project.getAssets().getEntries()) {
     for (auto &entry : typed) {
       if (entry.conf.exclude || entry.type == Project::FileType::UNKNOWN) continue;
@@ -97,9 +101,29 @@ bool Build::buildProject(const std::string &path)
   // Scenes
   project.getScenes().reload();
   const auto &scenes = project.getScenes().getEntries();
+
+  std::string sceneMapStr{};
+  std::string sceneNameStr{};
   for (const auto &scene : scenes) {
+    sceneMapStr += "if(path == \"" + scene.name + "\")return " + std::to_string(scene.id) + ";\n";
+    sceneNameStr += "\"" + scene.name + "\",\n";
     buildScene(project, scene, sceneCtx);
   }
+
+  auto sceneTableHeader = Utils::replaceAll(Utils::FS::loadTextFile("data/scripts/sceneTable.h"), {
+    {"{{SCENE_MAP}}", sceneMapStr},
+    {"{{SCENE_COUNT}}", std::to_string(scenes.size())}
+  });
+  Utils::FS::saveTextFile(project.getPath() + "/src/p64/sceneTable.h", sceneTableHeader);
+
+  Utils::FS::saveTextFile(project.getPath() + "/src/p64/sceneTable.cpp",
+    "#include \"sceneTable.h\"\n"
+    "\n"
+    "namespace P64::SceneManager {\n"
+    "  const char* SCENE_NAMES["+std::to_string(scenes.size())+"] = {\n" + sceneNameStr + "};\n"
+    "}\n"
+  );
+
 
   for(auto &builder : assetBuilders)
   {
@@ -121,7 +145,9 @@ bool Build::buildProject(const std::string &path)
   uint32_t baseOffset = (sceneCtx.assetList.size() * sizeof(uint32_t)*2) + sizeof(uint32_t);
   for (auto &entry : sceneCtx.assetList) {
     fileList.write(baseOffset + entry.stringOffset);
-    fileList.write(entry.type);
+    uint32_t ptr = entry.type << (32-4);
+    ptr |= entry.flags << (32-8);
+    fileList.write(ptr);
   }
   for (auto &entry : sceneCtx.assetList) {
     fileList.writeChars(entry.path.c_str(), entry.path.size()+1);

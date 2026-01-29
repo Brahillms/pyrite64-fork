@@ -31,6 +31,14 @@ namespace
     return res;
   }
 
+  fs::path getAssetPath(Project::Project *project) {
+    auto res = fs::path{project->getPath()} / "assets";
+    if (!fs::exists(res)) {
+      fs::create_directory(res);
+    }
+    return res;
+  }
+
   std::string getAssetROMPath(const std::string &path, const std::string &basePath)
   {
     auto pathAbs = fs::absolute(path).string();
@@ -358,4 +366,18 @@ void Project::AssetManager::createScript(const std::string &name) {
 
   Utils::FS::saveTextFile(filePath, code);
   reload();
+}
+
+uint64_t Project::AssetManager::createNodeGraph(const std::string &name)
+{
+  auto assetPath = getAssetPath(project);
+  auto filePath = assetPath / (name + ".p64graph");
+
+  if (fs::exists(filePath))return 0;
+
+  Utils::FS::saveTextFile(filePath, "{\"nodes\": [], \"links\": []}");
+  reload();
+
+  auto entry = getByName(name);
+  return entry ? entry->uuid : 0;
 }

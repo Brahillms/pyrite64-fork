@@ -1,5 +1,6 @@
 #include <filesystem>
 #include <libdragon.h>
+#include <rspq_profile.h>
 #include <t3d/t3d.h>
 #include <t3d/tpx.h>
 
@@ -49,6 +50,9 @@ int main()
 
   rdpq_init();
   //rdpq_debug_start();
+#if RSPQ_PROFILE
+  rspq_profile_start();
+#endif
 
   t3d_init({});
   tpx_init({});

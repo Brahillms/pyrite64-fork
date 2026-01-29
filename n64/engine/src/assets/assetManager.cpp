@@ -19,11 +19,17 @@ namespace
 {
   struct AssetEntry
   {
+    constexpr static uint8_t FLAG_KEEP_LOADED = 1 << 0;
+
     const char* path{};
     void* data{};
 
+    uint32_t getFlags() const {
+      return ((uint32_t)data >> (32-8)) & 0x0F;
+    }
+
     uint32_t getType() const {
-      return (uint32_t)data >> 24;
+      return (uint32_t)data >> (32-4);
     }
 
     void* getPointer() const {
@@ -92,16 +98,16 @@ void P64::AssetManager::init() {
 }
 
 void P64::AssetManager::freeAll() {
-  Log::warn("TODO: P64::AssetManager::freeAll");
-  return;
-
   for (uint32_t i = 0; i < assetTable->count; ++i)
   {
     auto &entry = assetTable->entries[i];
     if(entry.getPointer())
     {
+      auto flags = entry.getFlags();
+      if(flags & AssetEntry::FLAG_KEEP_LOADED)continue;
+
       auto type = entry.getType();
-      const auto &loader = assetHandler[type]; // @TODO: ignore global types (e.g. font)
+      const auto &loader = assetHandler[type];
       void *data = (void*)((uint32_t)entry.getPointer() | 0x8000'0000);
       loader.fnFree(data);
       entry.setPointer(nullptr);

@@ -12,7 +12,7 @@
 #include "lib/logger.h"
 #include "scene/scene.h"
 
-// #define LIBDRAGON_LAYERS 1
+#define LIBDRAGON_LAYERS 1
 
 namespace
 {
@@ -33,7 +33,8 @@ namespace
   constinit P64::DrawLayer::Setup *layerSetup{};
 
   #ifndef LIBDRAGON_LAYERS
-    constexpr uint32_t LAYER_BUFFER_WORDS = 1024*2;
+    constexpr uint32_t LAYER_BUFFER_WORDS = 1024;
+    constexpr uint32_t LAYER_BUFFER_WORDS_2D = 1024*2;
     constinit volatile uint32_t* layerMem{nullptr};
   #endif
 
@@ -61,21 +62,28 @@ void P64::DrawLayer::init(Setup &setup)
       }
     }
   #else
-    size_t allocSize = layers.size() * LAYER_BUFFER_WORDS * LAYER_BUFFER_COUNT * sizeof(uint32_t);
+    uint32_t countAlloc3D = setup.layerCount3D-1 + setup.layerCountPtx;
+    size_t allocSize = countAlloc3D * LAYER_BUFFER_WORDS;
+    allocSize += setup.layerCount2D * LAYER_BUFFER_WORDS_2D;
+    allocSize *= (LAYER_BUFFER_COUNT * sizeof(uint32_t));
+
     Log::info("DrawLayer mem-size: %d bytes", allocSize);
     layerMem = (volatile uint32_t*)malloc_uncached(allocSize);
     auto mem = layerMem;
 
+    uint32_t layerIdx = 0;
     for(auto &layer : layers)
     {
+      bool is2D = layerIdx >= countAlloc3D;
       layer.fill({});
       for(uint32_t i = 0; i < LAYER_BUFFER_COUNT; i++)
       {
         layer[i].pointer = mem;
         layer[i].current = mem;
-        layer[i].sentinel = mem + LAYER_BUFFER_WORDS;
-        mem += LAYER_BUFFER_WORDS;
+        mem += is2D ? LAYER_BUFFER_WORDS_2D : LAYER_BUFFER_WORDS;
+        layer[i].sentinel = mem;
       }
+      ++layerIdx;
     }
   #endif
 }
@@ -149,6 +157,8 @@ void P64::DrawLayer::draw(uint32_t layerIdx)
     rspq_queue_run(layer[frameIdx].queue);
     //rspq_wait();
   #else
+    //uint32_t sizeWord = layer[frameIdx].current - layer[frameIdx].pointer;
+    //debugf("Usage Layer %lu: %lu/%d words\n", layerIdx-1, sizeWord, layer[frameIdx].sentinel - layer[frameIdx].pointer);
     LD::RSPQ::exec(layer[frameIdx].pointer, layer[frameIdx].current);
   #endif
 }

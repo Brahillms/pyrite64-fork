@@ -37,7 +37,7 @@ namespace P64::Renderer::BigTex
     uint32_t allocSize = TEX_SIZE_BYTES * maxSize;
     debugf("Reserve %.2fKB (%.2fMB) for %lu textures\n", (double)allocSize/1024.0, (double)allocSize/1024.0/1024.0, maxSize);
     buffer = (uint8_t*)TEX_BASE_ADDR;
-    //buffer = (uint16_t*)malloc_uncached(allocSize);
+    sys_hw_memset(buffer, 0, allocSize);
   }
 
   Textures::~Textures() {

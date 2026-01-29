@@ -5,6 +5,7 @@
 #include "scene/scene.h"
 
 #include <libdragon.h>
+#include <rspq_profile.h>
 #include <t3d/t3d.h>
 
 #include "scene/scene.h"
@@ -30,6 +31,9 @@
 namespace
 {
   uint16_t nextId = 0xFF;
+#if RSPQ_PROFILE
+  uint32_t frameCount = 0;
+#endif
 }
 
 P64::Scene::Scene(uint16_t sceneId, Scene** ref)
@@ -270,6 +274,15 @@ void P64::Scene::draw([[maybe_unused]] float deltaTime)
 
   renderPipeline->draw();
   ticksDraw = get_ticks() - ticksDraw;
+
+#if RSPQ_PROFILE
+  rspq_profile_next_frame();
+  if(++frameCount == 30) {
+    rspq_profile_dump();
+    rspq_profile_reset();
+    frameCount = 0;
+  }
+#endif
 }
 
 void P64::Scene::onObjectCollision(const Coll::CollEvent &event)

@@ -152,5 +152,6 @@ namespace Project
       void save();
 
       void createScript(const std::string &name);
+      uint64_t createNodeGraph(const std::string &name);
   };
 }

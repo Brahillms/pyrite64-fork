@@ -64,11 +64,31 @@ namespace Project::Component::NodeGraph
       auto &assetList = ctx.project->getAssets().getTypeEntries(FileType::NODE_GRAPH);
       ImTable::addVecComboBox("File", assetList, data.asset.value);
 
-      ImTable::add("Edit");
+      ImTable::add("Action");
       if(ImGui::Button(ICON_MDI_PENCIL " Edit")) {
         Editor::Actions::call(Editor::Actions::Type::OPEN_NODE_GRAPH, std::to_string(data.asset.resolve(obj)));
       }
 
+      ImGui::SameLine();
+      if(ImGui::Button(ICON_MDI_PLUS " Create")) {
+        ImGui::OpenPopup("NewGraph");
+      }
+
+      if(ImGui::BeginPopup("NewGraph"))
+      {
+        static char scriptName[128] = "NodeGraph";
+        ImGui::Text("Enter name:");
+        ImGui::InputText("##Name", scriptName, sizeof(scriptName));
+        if (ImGui::Button("Create")) {
+          data.asset.value = ctx.project->getAssets().createNodeGraph(scriptName);
+          ImGui::CloseCurrentPopup();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel")) {
+          ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+      }
 
       ImTable::end();
     }

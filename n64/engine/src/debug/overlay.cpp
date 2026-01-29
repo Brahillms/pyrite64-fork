@@ -15,6 +15,11 @@
 #include <string>
 #include <filesystem>
 
+namespace P64::SceneManager
+{
+  extern const char* SCENE_NAMES[];
+}
+
 namespace {
   constexpr uint32_t SCREEN_HEIGHT = 240;
   constexpr uint32_t SCREEN_WIDTH = 320;
@@ -106,7 +111,8 @@ void Debug::Overlay::init()
   {
     std::string name{dir.d_name};
     if(name[0] == 's' && name.length() == 5) {
-      sceneNames.push_back(name.substr(1));
+      auto id = std::stoi(name.substr(1));
+      sceneNames.push_back(name.substr(1) + " - " + P64::SceneManager::SCENE_NAMES[id-1]);
     }
     res = dir_findnext(BASE_DIR, &dir);
   }

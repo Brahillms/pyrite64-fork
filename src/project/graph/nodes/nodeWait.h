@@ -44,7 +44,7 @@ namespace Project::Graph::Node
 
       void build(BuildCtx &ctx) override {
         ctx.localConst("uint64_t", "t_time", (uint64_t)(time * 1000.0f))
-          .line("corot_sleep(TICKS_FROM_MS(t_time));");
+          .line("coro_sleep(TICKS_FROM_MS(t_time));");
       }
   };
 }

@@ -38,13 +38,13 @@ void P64::NodeGraph::Instance::load(uint16_t assetIdx)
 {
   graphDef = (GraphDef*)AssetManager::getByIndex(assetIdx);
   debugf("Stack-size: %d %d\n", assetIdx, graphDef->stackSize);
-  corot = corot_create(graphDef->func, this, graphDef->stackSize*2);
+  corot = coro_create(graphDef->func, this, graphDef->stackSize*2);
 }
 
 P64::NodeGraph::Instance::~Instance()
 {
   if(corot) {
-    corot_destroy(corot);
+    coro_destroy(corot);
     corot = nullptr;
   }
 }
@@ -55,13 +55,13 @@ void P64::NodeGraph::Instance::update(float deltaTime) {
 
   //auto t = get_ticks();
   //disable_interrupts();
-  corot_resume(corot);
+  coro_resume(corot);
   //enable_interrupts();
   //t = get_ticks() - t;
 
-  if(corot_finished(corot))
+  if(coro_finished(corot))
   {
-    corot_destroy(corot);
+    coro_destroy(corot);
     corot = nullptr;
   }
 }
