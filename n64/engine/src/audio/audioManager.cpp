@@ -13,6 +13,7 @@ namespace
 {
   constexpr uint32_t CHANNEL_COUNT = 32;
   constinit uint16_t nextUUID{1};
+  constinit float masterVol{1.0f};
 
   struct Slot
   {
@@ -43,6 +44,10 @@ namespace P64::AudioManager
 {
   constinit uint64_t ticksUpdate{0};
 
+  void setMasterVolume(float volume) {
+    masterVol = volume;
+  }
+
   void init() {
     audio_init(32000, 3);
     mixer_init(CHANNEL_COUNT);
@@ -60,6 +65,14 @@ namespace P64::AudioManager
           slots[i+1].audio = nullptr;
         }
         slots[i].audio = nullptr;
+      }
+
+      if (slots[i].audio) { // mono
+
+        if (slots[i].audio->wave.channels == 2) {
+          mixer_ch_set_vol(i, slots[i].volume * masterVol, slots[i].volume * masterVol);
+          ++i;
+        }
       }
     }
     ticksUpdate += get_ticks() - ticks;
@@ -107,7 +120,14 @@ void P64::Audio::Handle::setVolume(float volume)
 {
   auto entry = &slots[slot];
   if(entry->uuid != uuid)return;
+
   entry->volume = volume;
+
+  // hack:
+  if (entry->audio->wave.channels == 2) {
+    volume *= masterVol;
+  }
+
   mixer_ch_set_vol(slot, volume, volume);
 }
 
