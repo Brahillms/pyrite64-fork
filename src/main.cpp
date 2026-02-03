@@ -165,6 +165,9 @@ int main(int argc, char** argv)
       delete ctx.project;
       try {
         ctx.project = new Project::Project(path);
+        if(ctx.project && !ctx.project->getScenes().getEntries().empty()) {
+          ctx.project->getScenes().loadScene(ctx.project->conf.sceneIdOnBoot);
+        }
       } catch (const std::exception &e) {
         Utils::Logger::log("Failed to open project: " + std::string(e.what()), Utils::Logger::LEVEL_ERROR);
         ctx.project = nullptr;
@@ -262,10 +265,6 @@ int main(int argc, char** argv)
     ctx.scene = &scene;
     Editor::Main editorMain{ctx.gpu};
     Editor::Scene editorScene{};
-
-    if (ctx.project) {
-      ctx.project->getScenes().loadScene(ctx.project->conf.sceneIdOnBoot);
-    }
 
     // Main loop
     bool done = false;
