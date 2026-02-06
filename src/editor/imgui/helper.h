@@ -8,6 +8,7 @@
 #include "misc/cpp/imgui_stdlib.h"
 #include "IconsMaterialDesignIcons.h"
 #include "../../project/project.h"
+#include "../undoRedo.h"
 #include "../../utils/filePicker.h"
 #include "../../utils/prop.h"
 #include "glm/vec3.hpp"
@@ -53,6 +54,7 @@ namespace ImGui
       labelSize,
       state ? ImVec4{1,1,1,1} : ImVec4{0.6f,0.6f,0.6f,1}
     )) {
+      Editor::UndoRedo::SnapshotScope snapshot(Editor::UndoRedo::getHistory(), "Toggle Property");
       state = !state;
       return true;
     }
@@ -123,6 +125,18 @@ namespace ImTable
     ImGui::AlignTextToFramePadding();
     ImGui::Text("%s", name.c_str());
     ImGui::TableSetColumnIndex(1);
+  }
+
+  inline void handleSnapshot(const std::string &description)
+  {
+    if (!obj) return;
+    auto &history = Editor::UndoRedo::getHistory();
+    if (ImGui::IsItemActivated()) {
+      history.beginSnapshot(description);
+    }
+    if (ImGui::IsItemDeactivatedAfterEdit()) {
+      history.endSnapshot();
+    }
   }
 
   template<typename T>
@@ -226,6 +240,7 @@ namespace ImTable
     ImGui::PushID(name.c_str());
     if(disabled)ImGui::BeginDisabled();
     bool res = typedInput<T>(&value);
+    handleSnapshot("Edit " + name);
     if(disabled)ImGui::EndDisabled();
     ImGui::PopID();
     return res;
@@ -237,6 +252,7 @@ namespace ImTable
     add(name);
     ImGui::PushID(name.c_str());
     bool res = typedInput<T>(&prop.value);
+    handleSnapshot("Edit " + name);
     ImGui::PopID();
     return res;
   }
@@ -267,6 +283,7 @@ namespace ImTable
         {24,24},
         ImVec4{1,1,1,1}
       )) {
+        Editor::UndoRedo::SnapshotScope snapshot(Editor::UndoRedo::getHistory(), "Edit " + name);
         propState->value = !propState->value;
       }
       ImGui::PopFont();
@@ -299,6 +316,7 @@ namespace ImTable
         ICON_MDI_LOCK,
         ImVec2{16,16}
       )) {
+        Editor::UndoRedo::SnapshotScope snapshot(Editor::UndoRedo::getHistory(), "Edit " + name);
         if(isOverrideLocal) {
           obj->addPropOverride(prop);
         } else {
@@ -309,6 +327,7 @@ namespace ImTable
     }
 
     res = editFunc(val);
+    handleSnapshot("Edit " + name);
 
     if(isDisabled)ImGui::EndDisabled();
 

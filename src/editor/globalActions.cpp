@@ -10,6 +10,7 @@
 #include "../utils/fs.h"
 #include "../utils/json.h"
 #include "../utils/proc.h"
+#include "undoRedo.h"
 
 namespace Editor::Actions
 {
@@ -18,6 +19,7 @@ namespace Editor::Actions
     registerAction(Type::PROJECT_OPEN, [](const std::string &path) {
        Utils::Logger::log("Open Project: " + path);
        delete ctx.project;
+       UndoRedo::getHistory().clear();
        try {
          ctx.project = new Project::Project(path);
          if(ctx.project && !ctx.project->getScenes().getEntries().empty()) {
@@ -32,6 +34,7 @@ namespace Editor::Actions
      });
 
     registerAction(Type::PROJECT_CLOSE, [](const std::string&) {
+      UndoRedo::getHistory().clear();
       delete ctx.project;
       ctx.project = nullptr;
       return true;
@@ -139,6 +142,7 @@ namespace Editor::Actions
       auto scene = ctx.project->getScenes().getLoadedScene();
       if(!scene)return false;
 
+      Editor::UndoRedo::SnapshotScope snapshot(Editor::UndoRedo::getHistory(), "Paste Object");
       auto obj = scene->addObject(ctx.clipboard.data, ctx.clipboard.refUUID);
       ctx.selObjectUUID = obj->uuid;
       return true;

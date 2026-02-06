@@ -5,3 +5,5 @@ cmake-*
 imgui.ini
 p64editor
 pyrite64
+.vscode
+*.pak

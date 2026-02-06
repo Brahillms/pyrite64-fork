@@ -8,6 +8,7 @@
 #include "../../imgui/helper.h"
 #include "../../../context.h"
 #include "../../../project/component/components.h"
+#include "../../undoRedo.h"
 
 Editor::ObjectInspector::ObjectInspector() {
 }
@@ -41,7 +42,7 @@ void Editor::ObjectInspector::draw() {
 
   //if (ImGui::CollapsingHeader("General", ImGuiTreeNodeFlags_DefaultOpen))
   {
-    if (ImTable::start("General")) {
+    if (ImTable::start("General", obj.get())) {
       ImTable::add("Name", obj->name);
 
       int idProxy = obj->id;
@@ -132,10 +133,14 @@ void Editor::ObjectInspector::draw() {
   }
 
   if (compCopy) {
-    srcObj->addComponent(compCopy->id);
-    srcObj->components.back().name = compCopy->name + " Copy";
+    const int compCopyId = compCopy->id;
+    const std::string compCopyName = compCopy->name;
+    Editor::UndoRedo::SnapshotScope snapshot(Editor::UndoRedo::getHistory(), "Duplicate Component");
+    srcObj->addComponent(compCopyId);
+    srcObj->components.back().name = compCopyName + " Copy";
   }
   if (compDelUUID) {
+    Editor::UndoRedo::SnapshotScope snapshot(Editor::UndoRedo::getHistory(), "Delete Component");
     srcObj->removeComponent(compDelUUID);
   }
 
@@ -151,6 +156,7 @@ void Editor::ObjectInspector::draw() {
     for (auto &comp : Project::Component::TABLE) {
       auto name = std::string{comp.icon} + " " + comp.name;
       if(ImGui::MenuItem(name.c_str())) {
+        Editor::UndoRedo::SnapshotScope snapshot(Editor::UndoRedo::getHistory(), "Add Component");
         srcObj->addComponent(comp.id);
       }
     }
