@@ -87,7 +87,7 @@ int main(int argc, char** argv)
   }
 
   // Create GPU Device
-  ctx.gpu = SDL_CreateGPUDevice(SDL_GPU_SHADERFORMAT_SPIRV | SDL_GPU_SHADERFORMAT_DXIL | SDL_GPU_SHADERFORMAT_METALLIB,true,nullptr);
+  ctx.gpu = SDL_CreateGPUDevice(SDL_GPU_SHADERFORMAT_SPIRV, true, nullptr);
   if (ctx.gpu == nullptr)
   {
     printf("Error: SDL_CreateGPUDevice(): %s\n", SDL_GetError());
@@ -96,7 +96,8 @@ int main(int argc, char** argv)
 
   auto pros = SDL_GetGPUDeviceProperties(ctx.gpu);
   auto gpuName = SDL_GetStringProperty(pros, SDL_PROP_GPU_DEVICE_NAME_STRING, "");
-  printf("Selected GPU: %s\n", gpuName);
+  auto gpuDriver = SDL_GetStringProperty(pros, SDL_PROP_GPU_DEVICE_DRIVER_NAME_STRING, "");
+  printf("Selected GPU: %s | %s\n", gpuName, gpuDriver);
   fflush(stdout);
 
   // Claim window for GPU Device
