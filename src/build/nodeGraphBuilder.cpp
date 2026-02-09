@@ -23,7 +23,7 @@ bool Build::buildNodeGraphAssets(Project::Project &project, SceneCtx &sceneCtx)
     auto projectPath = fs::path{project.getPath()};
     auto outPath = projectPath / asset.outPath;
     auto outDir = outPath.parent_path();
-    Utils::FS::ensureDir(outPath.parent_path());
+    fs::create_directories(outPath.parent_path());
 
     std::string sourceName = Utils::toHex64(asset.getUUID()) + ".cpp";
     fs::path sourceOutPath = sourcePath / sourceName;
@@ -31,7 +31,7 @@ bool Build::buildNodeGraphAssets(Project::Project &project, SceneCtx &sceneCtx)
     sceneCtx.files.push_back(Utils::FS::toUnixPath(asset.outPath));
     sceneCtx.graphFunctions.push_back(asset.getUUID());
 
-    if(!assetBuildNeeded(asset, outPath) && std::filesystem::exists(sourceOutPath))continue;
+    if(!assetBuildNeeded(asset, outPath) && fs::exists(sourceOutPath))continue;
 
     auto json = Utils::FS::loadTextFile(asset.path);
     Project::Graph::Graph graph{};

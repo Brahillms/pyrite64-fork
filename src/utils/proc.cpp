@@ -19,6 +19,8 @@
 
 #include "logger.h"
 
+namespace fs = std::filesystem;
+
 namespace
 {
   constexpr uint32_t BUFF_SIZE = 128;
@@ -66,7 +68,7 @@ std::string Utils::Proc::getSelfPath()
   char szPath[PATH_MAX];
   uint32_t bufsize = PATH_MAX;
   if (!_NSGetExecutablePath(szPath, &bufsize))
-    return std::filesystem::path{szPath}.parent_path() / ""; // to finish the folder path with (back)slash
+    return fs::path{szPath}.parent_path() / ""; // to finish the folder path with (back)slash
   return {};  // some error
 #else
   // Linux specific
@@ -77,10 +79,10 @@ std::string Utils::Proc::getSelfPath()
   szPath[count] = '\0';
 #endif
 
-  return std::filesystem::path{szPath}.string(); // to finish the folder path with (back)slash
+  return fs::path{szPath}.string(); // to finish the folder path with (back)slash
 }
 
 std::string Utils::Proc::getSelfDir()
 {
-  return (std::filesystem::path{getSelfPath()}.parent_path() / "").string();
+  return (fs::path{getSelfPath()}.parent_path() / "").string();
 }

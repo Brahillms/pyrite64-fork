@@ -5,6 +5,7 @@
 #pragma once
 #include <string>
 #include <filesystem>
+namespace fs = std::filesystem;
 
 namespace Utils
 {
@@ -13,7 +14,7 @@ namespace Utils
     public:
       struct State
       {
-        std::filesystem::path mingwPath{}; // empty if not found, always empty on linux
+        fs::path mingwPath{}; // empty if not found, always empty on linux
         bool hasToolchain{};
         bool hasLibdragon{};
         bool hasTiny3d{};

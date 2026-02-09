@@ -55,7 +55,7 @@ namespace
   }
 
 
-  void deserialize(Project::AssetConf &conf, const std::filesystem::path &pathMeta)
+  void deserialize(Project::AssetConf &conf, const fs::path &pathMeta)
   {
     auto doc = Utils::JSON::loadFile(pathMeta);
     if (doc.is_object()) {
@@ -348,7 +348,7 @@ void Project::AssetManager::save()
       // if the meta-data changed, force a recompile of the asset by deleting the target
       if (oldFile == json)continue;
       Utils::Logger::log("Asset meta-data changed, forcing recompile: " + entry.outPath, Utils::Logger::LEVEL_INFO);
-      Utils::FS::delFile(project->getPath() + "/" + entry.outPath);
+      fs::remove(project->getPath() + "/" + entry.outPath);
       Utils::FS::saveTextFile(pathMeta, entry.conf.serialize());
     }
   }
@@ -387,10 +387,10 @@ uint64_t Project::AssetManager::createNodeGraph(const std::string &name)
 
 Project::AssetManagerEntry *Project::AssetManager::getByPath(const std::string &path)
 {
-  std::filesystem::path pathIn{path};
+  fs::path pathIn{path};
   for (auto &typed : entries) {
     for (auto &entry : typed) {
-      if (std::filesystem::path{entry.path} == pathIn) {
+      if (fs::path{entry.path} == pathIn) {
         return &entry;
       }
     }

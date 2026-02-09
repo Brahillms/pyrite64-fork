@@ -20,7 +20,7 @@ bool Build::buildFontAssets(Project::Project &project, SceneCtx &sceneCtx)
     auto projectPath = fs::path{project.getPath()};
     auto outPath = projectPath / font.outPath;
     auto outDir = outPath.parent_path();
-    Utils::FS::ensureDir(outPath.parent_path());
+    fs::create_directories(outPath.parent_path());
 
     sceneCtx.files.push_back(Utils::FS::toUnixPath(font.outPath));
 
@@ -34,7 +34,7 @@ bool Build::buildFontAssets(Project::Project &project, SceneCtx &sceneCtx)
     int compr = (int)font.conf.compression - 1;
     if(compr < 0)compr = 1; // @TODO: pull default compression level
 
-    std::filesystem::path charsetFile{};
+    fs::path charsetFile{};
     if(!font.conf.fontCharset.value.empty()) {
       charsetFile = outDir / (font.name + "_charset.txt");
       Utils::FS::saveTextFile(charsetFile, font.conf.fontCharset.value);
@@ -47,7 +47,7 @@ bool Build::buildFontAssets(Project::Project &project, SceneCtx &sceneCtx)
     cmd += " \"" + font.path + "\"";
 
     bool res = sceneCtx.toolchain.runCmdSyncLogged(cmd);
-    std::filesystem::remove(charsetFile);
+    fs::remove(charsetFile);
     if(!res)return false;
   }
   return true;

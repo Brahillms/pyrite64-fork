@@ -14,6 +14,8 @@
 #include "glm/vec3.hpp"
 #include "glm/vec4.hpp"
 
+namespace fs = std::filesystem;
+
 namespace Utils
 {
   enum DataType
@@ -167,7 +169,7 @@ namespace Utils
         return dataSize;
       }
 
-      void writeToFile(const std::filesystem::path &filename) {
+      void writeToFile(const fs::path &filename) {
         FILE* file = fopen(filename.string().c_str(), "wb");
         fwrite(data.data(), 1, dataSize, file);
         fflush(file);

@@ -39,14 +39,14 @@ Project::Project::Project(const std::string &path)
     throw std::runtime_error("Not a valid project!");
   }
 
-  Utils::FS::ensureDir(path);
-  Utils::FS::ensureDir(path + "/data");
-  Utils::FS::ensureDir(path + "/data/scenes");
-  Utils::FS::ensureDir(path + "/assets");
-  Utils::FS::ensureDir(path + "/assets/p64");
-  Utils::FS::ensureDir(path + "/src");
-  Utils::FS::ensureDir(path + "/src/p64");
-  Utils::FS::ensureDir(path + "/src/user");
+  fs::create_directories(path);
+  fs::create_directories(path + "/data");
+  fs::create_directories(path + "/data/scenes");
+  fs::create_directories(path + "/assets");
+  fs::create_directories(path + "/assets/p64");
+  fs::create_directories(path + "/src");
+  fs::create_directories(path + "/src/p64");
+  fs::create_directories(path + "/src/user");
 
   Utils::FS::ensureFile(path + "/.gitignore", "data/build/baseGitignore");
   Utils::FS::ensureFile(path + "/Makefile.custom", "data/build/baseMakefile.custom");

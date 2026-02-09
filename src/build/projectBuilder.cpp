@@ -237,7 +237,7 @@ bool Build::buildProject(const std::string &path)
 }
 
 
-bool Build::assetBuildNeeded(const Project::AssetManagerEntry &asset, const std::filesystem::path &outPath)
+bool Build::assetBuildNeeded(const Project::AssetManagerEntry &asset, const fs::path &outPath)
 {
   auto ageSrc = Utils::FS::getFileAge(asset.path);
   auto ageDst = Utils::FS::getFileAge(outPath);

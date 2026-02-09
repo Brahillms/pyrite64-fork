@@ -34,7 +34,7 @@ bool Build::buildTextureAssets(Project::Project &project, SceneCtx &sceneCtx)
 
     auto assetPath = fs::path{project.getPath()} / outPath;
     auto assetDir = assetPath.parent_path();
-    Utils::FS::ensureDir(assetDir);
+    fs::create_directories(assetDir);
 
     if(!assetBuildNeeded(image, assetPath.string()))continue;
 

@@ -48,7 +48,7 @@ void cli(argparse::ArgumentParser &prog);
 // Main code
 int main(int argc, char** argv)
 {
-  std::filesystem::current_path(Utils::Proc::getSelfDir());
+  fs::current_path(Utils::Proc::getSelfDir());
   ctx.toolchain.scan();
 
   auto cliRes = CLI::run(argc, argv);

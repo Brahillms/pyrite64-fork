@@ -17,7 +17,7 @@ namespace Utils::JSON
     return nlohmann::json::parse(jsonData);
   }
 
-  inline nlohmann::json loadFile(const std::filesystem::path &path) {
+  inline nlohmann::json loadFile(const fs::path &path) {
     return  loadFile(path.string());
   }
   /*

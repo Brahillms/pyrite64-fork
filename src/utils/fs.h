@@ -7,10 +7,11 @@
 #include <vector>
 #include <cstdint>
 #include <filesystem>
+namespace fs = std::filesystem;
 
 namespace Utils::FS
 {
-  inline std::string loadTextFile(const std::filesystem::path &path) {
+  inline std::string loadTextFile(const fs::path &path) {
     FILE *file = fopen(path.string().c_str(), "rb");
     if(!file) {
       return "";
@@ -27,7 +28,7 @@ namespace Utils::FS
     return content;
   }
 
-  inline void saveTextFile(const std::filesystem::path &path, const std::string &content) {
+  inline void saveTextFile(const fs::path &path, const std::string &content) {
     FILE *file = fopen(path.string().c_str(), "wb");
     if(!file)return;
     fwrite(content.data(), 1, content.size(), file);
@@ -36,16 +37,11 @@ namespace Utils::FS
 
   std::vector<std::string> scanDirs(const std::string &basePath);
 
-  void ensureDir(const std::filesystem::path &path);
-  void ensureFile(const std::filesystem::path &path, const std::filesystem::path &pathTemplate);
-  void copyDir(const std::filesystem::path &srcPath, const std::filesystem::path &dstPath);
+  void ensureFile(const fs::path &path, const fs::path &pathTemplate);
 
-  void delFile(const std::string &filePath);
-  void delDir(const std::string &dirPath);
+  uint64_t getFileAge(const fs::path &filePath);
 
-  uint64_t getFileAge(const std::filesystem::path &filePath);
-
-  inline std::string toUnixPath(const std::filesystem::path &path) {
+  inline std::string toUnixPath(const fs::path &path) {
     auto res = path.string();
     for(auto &c : res) {
       if(c == '\\')c = '/';

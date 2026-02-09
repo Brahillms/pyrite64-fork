@@ -8,51 +8,29 @@
 std::vector<std::string> Utils::FS::scanDirs(const std::string &basePath)
 {
   std::vector<std::string> dirs{};
-  for (const auto &entry : std::filesystem::recursive_directory_iterator(basePath))
+  for (const auto &entry : fs::recursive_directory_iterator(basePath))
   {
     if (entry.is_directory()) {
-      auto relPath = std::filesystem::relative(entry.path(), basePath).string();
+      auto relPath = fs::relative(entry.path(), basePath).string();
       dirs.push_back(relPath);
     }
   }
   return dirs;
 }
 
-void Utils::FS::ensureDir(const std::filesystem::path &path)
+void Utils::FS::ensureFile(const fs::path &path, const fs::path &pathTemplate)
 {
-  if(!std::filesystem::exists(path)) {
-    std::filesystem::create_directories(path);
+  if(!fs::exists(path)) {
+    fs::create_directories(path.parent_path());
+    fs::copy_file(pathTemplate, path);
   }
 }
 
-void Utils::FS::ensureFile(const std::filesystem::path &path, const std::filesystem::path &pathTemplate)
+uint64_t Utils::FS::getFileAge(const fs::path &filePath)
 {
-  if(!std::filesystem::exists(path)) {
-    std::filesystem::create_directories(path.parent_path());
-    std::filesystem::copy_file(pathTemplate, path);
-  }
-}
-
-void Utils::FS::copyDir(const std::filesystem::path &srcPath, const std::filesystem::path &dstPath)
-{
-  std::filesystem::copy(srcPath, dstPath, std::filesystem::copy_options::recursive | std::filesystem::copy_options::overwrite_existing);
-}
-
-void Utils::FS::delFile(const std::string &filePath)
-{
-  std::filesystem::remove(filePath);
-}
-
-void Utils::FS::delDir(const std::string &dirPath)
-{
-  std::filesystem::remove_all(dirPath);
-}
-
-uint64_t Utils::FS::getFileAge(const std::filesystem::path &filePath)
-{
-  if(!std::filesystem::exists(filePath)) {
+  if(!fs::exists(filePath)) {
     return 0;
   }
-  auto ftime = std::filesystem::last_write_time(filePath);
+  auto ftime = fs::last_write_time(filePath);
   return ftime.time_since_epoch().count();
 }

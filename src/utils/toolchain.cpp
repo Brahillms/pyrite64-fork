@@ -21,8 +21,8 @@ void Utils::Toolchain::scan()
   #if defined(_WIN32)
 
     // Scan "C:\" directories for anything containing "msys"
-    state.mingwPath = std::filesystem::path{"C:\\msys64"};
-    if(!std::filesystem::exists(state.mingwPath)) {
+    state.mingwPath = fs::path{"C:\\msys64"};
+    if(!fs::exists(state.mingwPath)) {
       state.mingwPath.clear();
       return;
     }
@@ -31,21 +31,21 @@ void Utils::Toolchain::scan()
     if(state.mingwPath.empty())return;
 
     auto toolPath = state.mingwPath / "pyrite64-sdk";
-    if(std::filesystem::exists(toolPath / "bin" / "mips64-elf-gcc.exe")
-     && std::filesystem::exists(toolPath / "bin" / "mips64-elf-g++.exe")) {
+    if(fs::exists(toolPath / "bin" / "mips64-elf-gcc.exe")
+     && fs::exists(toolPath / "bin" / "mips64-elf-g++.exe")) {
       state.hasToolchain = true;
     }
 
-    if(std::filesystem::exists(toolPath / "bin" / "n64tool.exe")
-     && std::filesystem::exists(toolPath / "bin" / "mkdfs.exe")
-     && std::filesystem::exists(toolPath / "include" / "n64.mk")
+    if(fs::exists(toolPath / "bin" / "n64tool.exe")
+     && fs::exists(toolPath / "bin" / "mkdfs.exe")
+     && fs::exists(toolPath / "include" / "n64.mk")
     ) {
       state.hasLibdragon = true;
     }
 
-    if(std::filesystem::exists(toolPath / "bin" / "gltf_to_t3d.exe")
-     && std::filesystem::exists(toolPath / "include" / "t3d.mk")
-     && std::filesystem::exists(toolPath / "mips64-elf" / "include" / "t3d")
+    if(fs::exists(toolPath / "bin" / "gltf_to_t3d.exe")
+     && fs::exists(toolPath / "include" / "t3d.mk")
+     && fs::exists(toolPath / "mips64-elf" / "include" / "t3d")
     ) {
       state.hasTiny3d = true;
     }
@@ -61,10 +61,10 @@ void Utils::Toolchain::scan()
 
 namespace
 {
-  void runInstallScript(std::filesystem::path mingwPath) {
+  void runInstallScript(fs::path mingwPath) {
     // C:\msys64\usr\bin\mintty.exe /bin/env MSYSTEM=MINGW64 /bin/bash -l %self_path%mingw_create_env.sh
     auto minttyPath = mingwPath / "usr" / "bin" / "mintty.exe";
-    if (!std::filesystem::exists(minttyPath)) {
+    if (!fs::exists(minttyPath)) {
       printf("Error: mintty.exe not found at expected location: %s\n", minttyPath.string().c_str());
       installing.store(false);
       return;
@@ -72,7 +72,7 @@ namespace
 
     std::string command = minttyPath.string() + " /bin/env MSYSTEM=MINGW64 /bin/bash -l ";
     
-    std::filesystem::path selfPath{Utils::Proc::getSelfPath()};
+    fs::path selfPath{Utils::Proc::getSelfPath()};
     selfPath = selfPath.parent_path(); // remove executable name
     selfPath = selfPath / "data" / "scripts" / "mingw_create_env.sh"; // add script path
     command += "\"" + selfPath.string() + "\"";

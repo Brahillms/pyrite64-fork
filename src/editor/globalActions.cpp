@@ -63,16 +63,19 @@ namespace Editor::Actions
         return false;
       }
 
-      Utils::Logger::log("Create Project: " + args.value<std::string>("path", ""));
-
+      fs::path newPath{args["path"]};
+      Utils::Logger::log("Create Project: " + newPath.string());
+      std::filesystem::create_directories(newPath);
+      
       // copy example project as template
-      Utils::FS::copyDir("n64/examples/empty", args["path"]);
+      fs::copy("n64/examples/empty", newPath, 
+        fs::copy_options::recursive | fs::copy_options::overwrite_existing
+      );
 
       // clear some temp files
-      std::filesystem::path newPath{args["path"]};
-      std::filesystem::remove(newPath / "p64_project.z64");
-      std::filesystem::remove_all(newPath / "build");
-      std::filesystem::remove_all(newPath / "filesystem");
+      fs::remove(newPath / "p64_project.z64");
+      fs::remove_all(newPath / "build");
+      fs::remove_all(newPath / "filesystem");
 
       // open project.json and patch name
       auto configPath = (newPath / "project.json").string();
@@ -91,7 +94,7 @@ namespace Editor::Actions
       ImGui::SetWindowFocus("Log");
 
       auto z64Path = ctx.project->getPath() + "/" + ctx.project->conf.romName + ".z64";
-      Utils::FS::delFile(z64Path);
+      fs::remove(z64Path);
 
       std::string runCmd{};
       if (arg == "run") {

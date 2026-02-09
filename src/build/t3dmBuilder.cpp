@@ -74,7 +74,7 @@ bool Build::buildT3DMAssets(Project::Project &project, SceneCtx &sceneCtx)
     sceneCtx.files.push_back(Utils::FS::toUnixPath(model.outPath));
 
     if(assetBuildNeeded(model, t3dmPath)) {
-      Utils::FS::ensureDir(t3dmDir);
+      fs::create_directories(t3dmDir);
 
       T3DM::config = {
         .globalScale = (float)model.conf.baseScale,

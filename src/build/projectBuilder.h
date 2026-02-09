@@ -12,7 +12,7 @@ namespace Build
   typedef bool(*BuildFunc)(Project::Project &project, SceneCtx &sceneCtx);
 
   // helper
-  bool assetBuildNeeded(const Project::AssetManagerEntry &asset, const std::filesystem::path &outPath);
+  bool assetBuildNeeded(const Project::AssetManagerEntry &asset, const fs::path &outPath);
 
   // Asset builds
   void buildScene(Project::Project &project, const Project::SceneEntry &scene, SceneCtx &ctx);

@@ -107,7 +107,7 @@ bool Editor::CreateProjectOverlay::draw()
     ImGui::Dummy({0, 4});
     // text in gray
     ImGui::Text("Project will be created in:");
-    std::filesystem::path fullPath = projectPath;
+    fs::path fullPath = projectPath;
     fullPath = fullPath / projectSafeName;
     ImGui::TextColored({0.7f, 0.7f, 0.7f, 1.0f}, "%s", fullPath.string().c_str());
 

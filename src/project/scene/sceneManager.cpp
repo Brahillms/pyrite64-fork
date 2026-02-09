@@ -13,8 +13,8 @@ namespace
 {
   std::string getScenePath(Project::Project *project) {
     auto scenesPath = project->getPath() + "/data/scenes";
-    if (!std::filesystem::exists(scenesPath)) {
-      std::filesystem::create_directory(scenesPath);
+    if (!fs::exists(scenesPath)) {
+      fs::create_directory(scenesPath);
     }
     return scenesPath;
   }
@@ -27,7 +27,7 @@ void Project::SceneManager::reload()
   auto scenesPath = getScenePath(project);
 
   // list directories
-  for (const auto &entry : std::filesystem::directory_iterator{scenesPath}) {
+  for (const auto &entry : fs::directory_iterator{scenesPath}) {
     if (entry.is_directory()) {
       auto path = entry.path();
       auto name = path.filename().string();
@@ -84,9 +84,9 @@ void Project::SceneManager::add() {
       newId = entry.id + 1;
     }
   }
-  auto newPath = std::filesystem::path{scenesPath} / std::to_string(newId);
+  auto newPath = fs::path{scenesPath} / std::to_string(newId);
   printf("Create-Scene: %s\n", newPath.c_str());
-  std::filesystem::create_directory(newPath);
+  fs::create_directory(newPath);
 
   reload();
 }
